@@ -1,0 +1,2 @@
+Para correr algo de la lib standard, compilar con
+gcc {{argumentos}} -no-pie
