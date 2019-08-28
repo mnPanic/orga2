@@ -56,6 +56,37 @@ Directivas de ensamblador
 - `EQU`: Definir constantes que no quedan en el archivo objeto
 - `TIMES`: Prefijo para repetir una cantidad de veces la instrucción
 
+Convención C
+============
+
+_(en 64 bits)_
+
+- Preservar los registros RBX, R12, R13, R14, R15 y RBP.
+- Retornar el resultado a través de RAX si un valor entero (y RDX si ocupa 
+  128bits) o XMM0, si es un número de punto flotante.
+- Preservar la consistencia de la pila.
+- La pila opera alineada a 8 bytes. Pero antes de llamar a funciones de C debe
+  estarlo a 16 bytes.
+
+Pasaje de parámetros
+--------------------
+
+_En 32 bits_
+- Los parámetros se pasan a través de la pila desde la dirección más baja a la 
+  más alta.
+- Son apilados de derecha a izquierda según aparecen en la firma de la función.
+- Para valores de 64bits se apilan en little-endian.
+
+_En 64 bits_
+Los parámetros se pasan por registro, de izquierda a derecha según la firma de 
+la función, clasificados por tipo:
+
+- Enteros y direcciónes de memoria: RDI, RSI, RDX, RCX, R8 y R9
+- Punto flotante: XMM0 a XMM7
+- Resto de los parámetros que superen la cantidad de registros se ubican en la 
+  pila como en 32 bits.
+
+
 Syscalls
 ========
 
@@ -95,3 +126,4 @@ Ejecutar
   ```bash
   ld -o holamundo holamundo.o
   ```
+
