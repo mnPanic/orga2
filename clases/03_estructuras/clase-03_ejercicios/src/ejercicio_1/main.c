@@ -4,7 +4,6 @@ struct alumno {
     short comision;
     char * nombre;
     int edad;
-
 };
 
 struct alumno nuevo_alumno = {4, "Pepe", 21};

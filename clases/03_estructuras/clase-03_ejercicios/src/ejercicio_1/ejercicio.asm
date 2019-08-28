@@ -1,33 +1,42 @@
 %define NULL 0
-; Completar!
+
+; -> len => offset
+;struct alumno {
+;    short comision; -> 2 => 0  (a 2)
+;    char * nombre;	 -> 8 => 8  (a 16)
+;    int edad;		 -> 4 => 16 (a 20)
+;};
+
 %define offset_comision 0
-; Completar!
-%define offset_nombre 0
-; Completar!
-%define offset_edad 0
+%define offset_nombre 8
+%define offset_edad 16
 
-; En mac, las funciones llevan un _ adelante
-; En caso de mac, _printf
 extern printf
-
-; En caso de mac, global _mostrarAlumno
 global mostrarAlumno
 
-section .data
-	texto: db "Nombre: %s, comision: %hd, edad: %d", 0x0a, 0x00
+section .rodata
+	fmt: db "Nombre: %s, comision: %hd, edad: %d", 0x0a, 0x00
 
 section .text
-
-; En caso de mac, _mostrarAlumno
-; Me llega por RDI el PUNTERO a la estructura
+ 
 mostrarAlumno:
+	; void mostrarAlumno(struct alumno * un_alumno);
+	; un_alumno = rdi
 	push rbp
 	mov rbp, rsp
 	; Pila alineada
-	; Recordar pushear RBX, R12, R13, R14 y R15 si se utilizan
 
+	; printf(char* fmt, nombre, comision, edad)
+	; rdi = fmt
+	; rsi = nombre
+	; dx  = comision
+	; ecx = edad
+	mov rsi, [rdi + offset_nombre]
+	mov dx,  [rdi + offset_comision]
+	mov ecx, [rdi + offset_edad]
+	mov rdi, fmt
 
-
+	call printf
 	; Desencolo
 	pop rbp
 	ret
