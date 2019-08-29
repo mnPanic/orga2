@@ -42,16 +42,17 @@ borrarUltimo:
 	je .fin
 	mov r9_prev, r8_next
 	lea r8_next, [r8_next + nodo_offset_prox]
+	jmp .ciclo
 
 .fin:
 	; Estoy en el fin, borro el último
 	mov rdi, [r9_prev]
 	push r9_prev ; alineado
 	call free
+	pop r9_prev
 	mov word [r9_prev], NULL
 
 	; Reestablezco stack
-	pop r9_prev
 	pop rbp
 	ret
 

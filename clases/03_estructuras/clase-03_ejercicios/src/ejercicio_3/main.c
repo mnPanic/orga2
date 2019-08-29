@@ -63,18 +63,22 @@ int main(){
 	
 	// borro Ultimo
 	borrarUltimo(lista1);
-	borrarUltimo(lista1);
-	borrarUltimo(lista1);
-	borrarUltimo(lista1);
+	mostrarLista( lista1 );
+
+	//borrarUltimo(lista1);
+	//mostrarLista( lista1 );
+
+	//borrarUltimo(lista1);
+	//borrarUltimo(lista1);
 	
-	borrarUltimo(lista1); // borra sobre una lista sin elementos
+	//borrarUltimo(lista1); // borra sobre una lista sin elementos
 	
 	// muestro a la lista
 	printf("Lista sin elementos\n");
 	mostrarLista(lista1);
 	
 	// libero memoria de la lista
-	destruirLista(lista1);
+	//destruirLista(lista1);
 	
 	return 0;
 	
