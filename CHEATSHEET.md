@@ -127,3 +127,17 @@ Ejecutar
   ld -o holamundo holamundo.o
   ```
 
+SIMD
+====
+
+Empaquetamiento
+---------------
+
+Un registro xmm tiene 128 bits, 16 bytes, y entran
+
+    n   Byes        bits        size    type
+    16  1 byte      8 bits      byte    char
+    8   2 bytes     16 bits     word    short
+    4   4 bytes     32 bits     dword   int / float
+    2   8 bytes     64 bits     qword   double
+    1   16 bytes    128 bits    dqword
