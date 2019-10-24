@@ -1,0 +1,164 @@
+24/10/19 - Manejo de memoria
+
+Paginación
+==========
+
+Si no se pone el CR3, explota todo
+
+Dirección virtual
+-----------------
+
+Composición
+
+    Directorio  Tabla   Offset      que indica
+        10       10       12        bits
+
+TLB: Translation Lookaside Buffer
+---------------------------------
+
+En la TLB se guarda los bits mas significativos de la dirección lineal y
+la dirección base de la página (los 20 mas significativos)
+Solo se guardan los más significativos ya que los 12  menos tienen que ser 0,
+pues está alineada a 4K
+
+Sirve para no tener que ir siempre a memoria, sino cada vez que se genera una
+dirección hay que ir dos veces a memoria.
+
+La primera vez me fumo los dos accesos, paso por el directorio, encuentro la
+tabla, luego el descriptor de página.
+Eso se guarda en la TLB, y después directamente cuando necesito una dirección
+lineal dentro de esa página (de esos 4k, osea que los más significativos
+sean iguales) entonces no tengo que ir a memoria, ya lo tengo cacheado.
+
+Prender paginación
+------------------
+
+- Tener por lo menos un directorio que tenga una tabla que apunte correctamente
+- Me busco el CR3 y le pongo la dirección física del directorio
+- Respiramos hondo y prendemos el bit de paginación
+
+Para arrancar todo sin romper todo, usamos Identity Mapping, donde la dirección
+física es igual a la lineal.
+Los sistemas operativos no hacen eso en realidad, los programas en C te dan
+siempre el mismo puntero, pero la física es siempre diferente.
+Te dan solamente la virtual.
+
+Extensiones de memoria física
+-----------------------------
+
+Como se terminó rápido la memoria RAM, salieron procesadores con extensiones
+de memoria.
+
+Con el *Pentium Pro* salen dos métodos:
+  
+  PAE     Physical Address Extensions
+  PSE-36  Page Size Extensions
+
+PAE es el mejor y el otro es un _engendro_
+Ambos son mutuamente excluyentes y se seleccionan en CR4, sino te tira una
+general protection exception.
+
+PSE-36
+~~~~~~
+
+Los procesadores ahora tienen más pines de address, para poder direccionar la
+memoria extra. Al prender uno de sos bits, el procesador activa esos pines.
+Como quedó en el olvido, para usarlo hay que usar `cpuid`, que ya pasó de ser
+una instrucción a ser un subsistema.
+Para invocarla, se pone un valor en EAX y en EDX te devuelve un resultado
+
+Mapea el espacio extra en páginas de 4MB, 2^22, osea 22 bits para representar
+todas las direcciones posibles. Esas páginas son grandes.
+Solamente en el directorio está el descriptor de la página, no hay tabla de
+página. eso es porque se pueden tener 1024 páginas de 4MB (llega a 64GB) y los 
+offsets alcanza con 10 bits.
+
+CR3:
+
+* Dirección fisica de la tabla de página
+
+* PCD - Page Cache Disable
+  Deshabilita el cacheo de la página
+
+* PWT - Page Write Through
+  Escribe en RAM dinámica y después caché. (poniendolo en 1)
+  Si lo ponés en 0 es copy back
+
+
+{{descriptores de directorio de tablas, p.118}}
+
+Bits interesantes en descriptores de pagina
+- D: Hay un bit en el descriptor de la página que es el Dirty, que dice si la página
+fue modificada. La utilidad que tiene €s que en caso de que no esté dirty, si
+tiene que bajarla devuelta a RAM directamente la pisa, no hace falta que la
+transfiera, ya que como no está dirty, su contenido es igual a en RAM.
+
+- G: Global
+  Cada vez que cambiamos el registro CR3, básicamente cambiamos de tarea.
+  Desde una tarea no podríamos cambiarlo, entonces si lo estamos cambiando,
+  alguien (el SO) cambió de tarea.
+  Eso quiere decir que la TLB (que tiene las traducciones de las direcciones
+  virtuales a físicas) tiene mapeos distintos, la primera podría estar igual
+  (las virtuales) pero la segunda (las físcias) seguramente no.
+  
+  Limpia la TLB ya que en principio no tiene sentido.
+  Lo primero que hace la tarea es malloc, y es una fiaca tener que ir devuelta
+  a memoria a buscar algo que ya estaba cargado en memoria. 
+  Las páginas del SO; que manejan las interrupciones, etc. las ponen en
+  globales para que no se limpien al cambiar de tarea.
+
+  De todas formas, si nadie la llama por mucho tiempo va a ser desalojada,
+  ya que está en la misma política de desalojo que el resto de las páginas
+
+- U/S: Usuario (1)
+       Supervisor (0)
+
+- R/W: O leer o escribir 
+  readable - solo lectura
+  writable - lectura y escritura
+
+  Y las páginas de código? No hay forma de saberlo. Es un crater que tiene
+  este mecanismo
+  Es muy importante poder diferenciar, porque sino te pueden pasar un buffer
+  de memoria como datos, y después hacer jmp a eso y listo, kernel exploit.
+
+PAE
+~~~
+
+CR3
+
+    31:5    Dirección física de tabla de punteros a directorio de paginas
+    4:0     Ignorados
+
+El costo de PAE es que duplica el tamaño de descriptor de página, osea
+tienen 8 bytes
+
+Hay tres niveles de paginación
+Hay 4 directorios de paginas
+
+Nuevo atributo: XD (Execution Disable) subsana el hueco de seguridad, sirve
+para que una tarea no pueda tratar una página de datos como de código.
+Se pone en 1 a los datos.
+
+Paginación de 64 bits IA-32e
+============================
+
+Es solo paginación, AMD casi totalmente diliyó la segmentación.
+Para poner el procesador en 64 bits, hay que tener PAE activo.
+(y en modo protegido).
+
+Se usan direcciones lineales de 48 bits (se pueden direccionar hasta 256TB).
+
+Ahora CR3 tiene 64 bits.
+{{figura de cr3 p.144}}
+
+PML4: Page mode level 4 (hay 4 niveles de paginación)
+{{figura de la atrocidad que es en p.145}}
+
+ARM
+===
+
+Es bastante parecido con intel
+{{a partir de p.157}}
+
+Furfi lo pasó bastante por arriba, es a modo informativo nomás

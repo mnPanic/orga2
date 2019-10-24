@@ -1,0 +1,299 @@
+10/10/19
+
+Excepciones
+-----------
+
+ARM tiene dos stack pointers
+
+Prioridades
+-----------
+
+CUando hay simultaneidad, varias interrupciones se producen todas juntas.
+Se produce una excepción y uno apreta una tecla.
+
+{{tabla de prioridades p35}
+
+Tipos de interrupciones
+~~~~
+
+No las nombra mucho porque están en el manual
+* 0: Dividir por 0
+    En realidad es cuando el resultado no entra en el operando destino
+    (ej 2^16/2)
+* 1:
+...
+* 5: No tiene sentido
+
+* 6: Invalid OPcode
+    Antes, el resultado de un codigo fruta era impredecible, más fruta, 
+    mono con navaja.
+
+* 7: Device not available
+    Explicada en la clase de tareas (porque no sabemos nada de tareas)
+    Se utiliza para poder conmutar registros de la FPU cuando es necesario
+    (xmm)
+
+* 8: Double Fault
+    Importante.
+    Que pasó con una doble falta? Varias ex. a la vez.
+    Puede ser que una ins produzca más de una excepción, las puedo procesar
+    en serie?
+    Si se pueden procesar en serie no pasa nada (no se produce)
+    Pero si se producen dos que no se pueden procesar serialmente, hay una
+    doble falta. I.e se rompió todo. Irraparable
+    Cuando ocurre, no podés confiar en el stack, IP, te queda todo feo, no podés
+    confiar en nada. No te queda apuntando a un lugar cierto.
+
+    Linux para esto usa una puerta de tarea. Como el contexto de la tarea que la
+    produjo está todo roto, no lo podés usar, generas una triple falta.
+    Con triple falta se hace halt y muere todo.
+    Para poder levantar registros sanos para esta tarea.
+
+    Las instrucciones desde el punto de vista de la double fault pueden ser:
+        - Benignas: 
+        - Contributivas
+        - Page Fault: La memoria se divide en páginas, tira el error cuando está
+          en la memoria virttual al ir a buscarla
+    
+    Si la primera es benigna, listo
+    {{tabla p48}}
+
+* 9: Obsoleto
+* 10: TSS invalido
+    TSS es un segmento donde se guardan los registros cuando se ejecuta la tarea
+
+* 11: Segmento no presente
+    Cuando se quiere acceder a un segmento que está en la memoria virtual.
+    (bit P del descriptor en 0), acá el SO hace el swap hacia la memoria.
+    No se produce nunca.
+* 12: Stack fault
+    El stack es tan importante que tiene su propia excepción.
+    Si te pasas del stack (stack overflow) vas a pasar a esta.
+
+* 13: General protection fault
+    Cualqueir violacion a reglas de protección.
+    Tiene 50 millones de causas.
+
+* 14: Page Fault
+    Vamos a ver paginación después.
+    En CR2 se guarda la dirección lineal que produjo el page fault.
+    Te dice lo que pasó y que metiste para que se te arme el quilombo, con eso
+    deberías poder arreglarlo.
+
+* 15: Obsoleta, reemplazda por la 19
+* 17: 
+    Hay instrucciones que le podés decir que lo mueva si está alineado, y si
+    falla lo alinie.
+    Ningún kernel lo debe hacer.
+
+* 18: Error intern ode hardware, RIP.
+* 19: SIMD FP Exception
+    Todos los problemas entran por acá.
+
+Interrupciones en una PC
+------------------------
+
+El procesador solito no puede. Las excepciones e interrupciones las maneja,
+pero las de hardware? Hay muchos disp que lo interupmpen, hay que poner algo en
+el medio que las agarre, las maneje y los vaya interrumpiendo.
+
+PIC
+~~~
+
+Programmable Interrupt Controller
+
+Por razones históricas arranco con un controlador programable.
+Es horrenda, un chip de los early 70s.
+El viejo y querido PIC te maneja la primera interrupción.
+El APIC (Advanced PIC) es más complejo.
+
+{{diagrama p81}}
+
+* IMR: Interrupt mask register. Habilita o deshabilita las lineas.
+    En el procesador en general, con
+        - CLI (clear interrupt)
+        - STI (set interrupt)
+
+    Si la máscara está inactiva, la interrupción pasa, sino no pasa.
+
+* IRR: Puerta de entrada de dispositivos hacia el sistema.
+    Tiene 8 bits (IR0 - IR7)
+    Se puede habilitar por flanco o nivel.
+    Por nivel obligas a que lo mantengan levantado.
+    Por flanco latcheas el pedido hasta que sea antendido
+
+* ISR: In service register
+    Dice que interrupciónes está siendo atendidas.
+
+    Las interrupciones de hardware se pueden anidar.
+    Puedo tomar dos criterios
+        - Que la que está teniendo lugar acepte el pedido
+        - No
+    
+    A nivel de hardware, tiene dos modos de trabajo. La PIC toma uno y el otro
+    no es posible.
+
+    Suponete que pasa IR1, cuando la está atendiendo se prende el bit 1 en la ISR
+    mientras que esté seteado ni la misma ni ninguna de las menos prioritarias se
+    puede ejecutar.
+    Cuando se limpia, se puede.
+
+* Priority Resolver: Ve estas cosas y toma decisiones
+    Detectal os cambios de estados y ve las máscaras, y si se está ejecutando
+    alguna de prioridad mayor.
+    Si todo eso está en orden recien ahí lo manda.
+
+* Prioridades
+    La IR0 es la más prioritaria y la IR7 la menos.
+
+Esto es un dispositivo de E/S para el procesador.
+Tiene una interfaz a travès de la cual el procesaodr la puede programar.
+
+Si lo tiene que programar, le tiene que enviar comandos, entonces tiene que haber
+un bus de datos. Y esto tiene que ser identificable.
+Los procesadores tienen dos espacios, memoria y E/S, esto se mapea en E/S.
+
+* Cascading
+    Se puede trabajar en cascada
+    Se puede poner uno como maestro y después slaves, con más PIC (solo dos niveles)
+
+    Se pone un maestro y un esclavo.
+
+Conexionado
+~~~~~~~~~~~
+
+{{p.82}}
+
+
+Dos grupos de comandos, para inicializarlo y usarlo
+
+Inicializarlo
+·············
+
+Los tenés que ejecutra todos juntos al principio.
+Si o si hay que inicializarlo antes de usarlo.
+Para eso, tenés dos, tres o 4 comandos.
+{{secuencia de inicialización p83}}
+
+Hay que siempre inicializarlo de forma completa, aunque se quiera hacer una
+modificación.
+
+ICW1 - ICW4: Inicialization control words
+
+Las obligatorias son ICW1 y 2. Se tienen que ejecutar en secuencia.
+
+Si hay más de uno, tener que hacer una por PIC.
+
+El dispositivo detecta que se comenzó una secuencia de incialización cuando
+el procesador escribe en la posición 0 bit 4
+
+ICW4: Que procesador quiero (8086, 8085)
+
+{{p 84 para las control words}}
+
+* LTM: Trigger mode (level o edge)
+
+Al ser interrumpido:
+El procesador termina la instrucción que está ejecutando (y tal vez la sig.)
+y comienza el proceso de vectorización:
+    1. Identificar fuente:
+    Necesita el tipo para saber que int es (0, 1, 2 hasta 255)
+    Como le entró por el PIn es de hardware.
+    El responsable de entregar el tipo es el hardware.
+
+    Para que pueda hacer eso, tiene que haber un intercambio de señales, entonces
+    hay una especie de handshake.
+    Para eso el procesador le pone un pulso en iNTA (le reconoce la int.)
+    En ese pulso, si está programado en fin de int automático, limpia el bit
+
+    - Si el PIC master tiene conectado un disp. en esa linea:
+      En el segundo pulso INTA, el tipo viaja por el bus de datos. (el programado
+      en ICW2)
+
+    - Si tiene conectado un slave:
+      Juegan las lineas de cascada.
+      El INTA le llega a todos, y el master sabe que tiene conectado en
+      cada interrupción. Entonces cuando le llega el 2do inta, por las lineas
+      de cadascada pone el número y el slave sabe que le corresponde a el, y
+      pone el tipo en el bus de datos.
+
+
+Usarlo
+······
+
+Hay tres comandos.
+Operational Control Words
+OCW1 - OCW3
+
+* OCW1:
+    Que posiciones de memoria toma cada PIC.
+
+* OCW2:
+    Solo le mando comandos. Escribo.
+    Lo único que interesa es lo de fin de interrupción. El resto no hay que
+    usarlo.
+
+    El comando fin de interrupción se usa para bajar el ISR. Solo se usa cuando
+    está configurado con fin de interrupción *no* automático.
+    Hay dos tipos:
+    - El no específico baja todos. Un poco kbz
+    - Sino le podes decir especificamente cual queres bajar. Más prolijo.
+      El bit i del ISR lo vuelve a poner el 0. A partir de eso, las >= i pueden
+      volver a ser atendidas.
+
+* OCW3:
+    Comandos de lectura.
+    Si le escribo que quiero leer ISR, y IRR puedo hacer dos lecturas cosecutivas.
+
+Conexión en bochs
+
+* IR0: Timer que anda mal
+    De acá se cuelga el scheduler (porque *periodicamente* tiene que hacer cosas).
+
+* IR1: Teclado
+    Mapeado en la 60 para leer el código de la tecla.
+    No es ASCII, es el scan code.
+
+Lo demás no importa :)
+
+Sobrevivir a la pulsación de una tecla:
+    - Bloque de inicialización: Rutina del PIC
+    - Habilitar la mascara de int (toda en 1) y CLI
+    - Ponemos bien el vector de la IDT (justo el descriptor 0x21)
+    - Y después STI, habilitamos y tocamos una tecla
+    - Leemos el cód de scan en la pos 60
+    - end of interrup
+
+Si eso funciona somos gardel
+
+APIC
+----
+
+Es lo que hoy se usa (pero de 1990) aparece con el pentium.
+Nace por la necesidad de multiprocesamiento simétrico, algo que permita generar
+interrupciones con varios procesadores.
+
+Es tan complejo que está dividido en dos: chipset y cores.
+Esta parte es para otra materia u otra vida.
+
+Cambio de stack
+········
+
+Cambiar esp y ss (stack segment). ebp no importa.
+
+```
+0   mov esp, nuevo_esp  ; Si se prodoce una int acá se pudre todo
+1   mov ax, nuevo_ss
+2   mov ss, ax
+```
+
+Si hay una int en la 0, se rompe todo.
+Entonces la forma correcta (para no usar CLI)
+
+```
+0   mov ax, nuevo_ss    ; asume que la siguiente instrucción es atómica
+1   mov ss, ax
+2   mov esp, nuevo_esp
+```
+
+De esta forma, el procesador solo la protege.

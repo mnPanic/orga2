@@ -1,0 +1,146 @@
+15/10/19
+
+Interrupciones
+==============
+
+Descriptores
+------------
+
+Son descriptores de sistema
+Tres tipos
+
+- Interrupt Gate
+    * DPL: Nivel de privilegio que va a tener el usuario de la rutina.
+      Nivel 0 para kernel. 
+      Si nosotros somos nivel 3 y hacemos int pepe, si pepe tiene nivel 0
+      no vamos a tener. 
+
+    > En el TP, los servicios del sistema se llaman desde nivel 3 porque se
+    > llaman desde las tareas, entonces deberían tener DPL 3
+
+    * No podemos poner segmentos de código de nivel 3.
+    * No modificar lo que indica el tipo de descriptor
+    * D = 1 porque estamos en 32 bits
+
+Atención
+--------
+
+{{figura}}
+
+La unica diferencia entre Interrupt y Trap gate es esa, el resto son
+exactamente iguales.
+
+Tipos de interrupciones:
+- Las interrupciones de tipo interrupcion tienen de diferencia que los
+  flags de interrupciones están en 0, i.e nadie más te puede interrumpir
+
+- Las Trap los flags de interrupciones no se tocan, te pueden seguir
+  interrumpiendo.
+  Manualmente, a travès de código, podríamos cambiar ese flag. 
+  
+  Cuando se realiza el `iret`, se ejecuta devuelta la misma instrucción que
+  produjo la excepción.  
+
+- Abort: No se donde estoy, no me preguntes, hacé ret.
+
+TP (Ej 2)
+---------
+
+Es armar la IDT
+
+- idt.h
+- idt.c
+
+Problema: Muchas rutinas atienden las interrupciones
+Donde están? En algún lado en código
+Se exactamente la dir? 
+    No, no tengo ni idea.
+    Lo voy a saber cuando lo compile.
+No tenemos eso a la hora de rellenar la IDT, y esta nos pide el offset
+exacta. La forma que hacemos es la chanta, la forma _linux style_ es hacer
+dos pasadas
+1. Compilo y me guardo las direcciones
+2. Completo esas direcciones en una tabla estática en memoria.
+
+La manera chanta es en tiempo de ejecución (ejecutar una función que rellene
+la tabla de algo que ya se cuando está compilado)
+
+La rutina hay que hacerla si o si en asm, pero el procedimiento de ella puede
+estar tranquilamente en c. Siempre y cuando se haga el `IRET`
+
+No olvidarse de la convención c para 32 bits.
+    - Todo lo que retornamos y tomamos como parámetro está en la pila.
+
+Teclado
+-------
+
+El teclado se lee a través del puerto 0x60, a través del cual se obtiene el
+scan code.
+
+    in al, 0x60 ; Lee el puerto 60 y se queda en al lo que leyó en ese puerto
+
+El controlador de teclado es el que deja en el puerto 60 para la próxima
+lectura la tecla que leyó. Este tiene un buffer de las últimas teclas
+apretadas, si se llena, chilla (y es por eso que a veces se escucha un ruidito
+cuando se traba la PC y uno escribe mucho).
+
+Las teclas no están en ASCII, sino que en *scan codes*, que son las teclas
+en orden.
+
+Composición
+~~~~~~~~~~~
+
+- Make: Si está en 0 el msb, estoy apretando la tecla
+- Break: Si está en 1 el msb, estoy soltando la tecla.
+
+Los 7 bits restantes son el scan code
+
+Clock
+-----
+
+> Acá hay que implementar la lógica del scheduler
+> Por ahora, solo hay que llamar a next_clock. Esta imprime caracteres que dan
+> vueltas.
+
+PIC
+---
+
+Hay que llamar a `pic_reset` desde el archivo de `kernel.asm`
+El PIC es el controlador de interrupciones, nos dan esa rutina que lo
+configura para que quede exactamente en el lugar que corresponde a modo
+protegido. 
+
+- `pic_enable`: Habilita el PIC.
+- `pic_disable`: Deshabilita el PIC. Está por completitud, es una manera 
+   hardcore de hacer un CLI
+
+Cuando cae una interrupción de un evento externo, (ex. el teclado, clock) el
+PIC queda esperando el la confirmación de que se atendió la interrupción
+hay que avisarle que terminamos la interrupción.
+Para esto, se usan instrucciones de E/S.
+
+    pic_finish1
+    pic_finish2
+
+La diferencia entre ambas es porque tenemos dos PICs, que están mapeados a
+espacios de direcciones diferentes.
+El video va E/S mapeada a memoria, y hay cosas que van por un bus dedicado,
+como el PIC.
+
+Estas solo se llaman en rutinas que son invocadas por el PIC, a veces llamamos
+a pic_finish. Sino le estamos avisando al PIC que finalizó una rutina que
+nunca sucedió.
+No está bien llamarlo en una rutina de excepción.
+En el manual figuran las definidas por el usuario (30 en adelamnte) y las otras
+algunas son reservadas y las demás específicas para un caso de uso.
+
+> En el TP tenemos que atender todas las excepciones, para así matar a la tarea
+> que la causó.
+
+Que interrupciones pasan por el PIC?
+
+    Lo de int 80 del principio de la materia no pasa por el PIC, genera una int
+    que usa un servicio del sistema, no fue el PIC que lo generó
+
+    Las interrupciones que pasan por el PIC son las que vienen de afuera del
+    procesador.

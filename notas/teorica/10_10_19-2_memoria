@@ -1,0 +1,146 @@
+10/10/19
+
+Memoria
+
+La doble falta se maneja con una tarea
+Deja todo tan choto que lo unico que se puede hacer es levantar un stack y
+todo nuevo.
+
+Paginación
+==========
+
+Segmentación
+
++ Muy flexible, es muy comodo para reubicar memoria, lo único que hay que
+cambiar es el registro de segmento y el resto sale andando.
+
+- Tener segmentos de cualquier tamaño es muy incómodo y difícil de administrar
+Por ejemplo, para hacer los swap, si el segmento con el que se swapea (LRU)
+es de tamaño menor, hay que buscar más, y si no son contiguos, hay que reubicar
+memoria, y esto hace que no sea determnista.
+Que pueda tardar mucho
+Esto hace que el algoritmo de memoria virtual sea muy complejo
+
+La paginación es al revez
+
+Los bloques son de tamaño fijo
+- Más rogido
+Necesito almacenar 14 bytes, NO.
+
++ Determinismo absoluto para el swap, siempre tengo que cambiar una sola página
+  (porque es página por página) y es más simple.
+
+Cuando hicieron UNIX, el manejo de mmeoria es por bloques de tamaño fijo.
+Organizaron la memoria del SO en páginas.
+
+IA-32
+-----
+
+Los procesadores de intel originalmente no usaban paginación, sino que por segmentos.
+Como todos los SOs usaban tamaño fijo, en un momento le introducen a la unidad
+de manejo de memoria la *unidad de paginación* luego de la de *segmentación*
+
+Por temas de compatibilidad comienza deshabilitada.
+El CR0 tiene un bit (PG) para prender la paginación.
+
+La paginación ayuda a resolver los problemas de protección que se pierden
+totalmente cuando se usa segmentación flat.
+
+
+Unidad de paginación
+--------------------
+
+La unidad de paginacion toma el espacio lineal que genera la de segmentación,
+y lo subdivide en páginas de 4k.
+
+Ventajas:
+- No tenés que tener todo el segmento en la memoria, podés tener una página.
+  Ahorrás memoria para cargar un proceso. Antes tenías que cargar todo
+  el segmento completo. Cargás el segmento en la virtual, y a la memoria van
+  solo los primeros 4k.
+  En 4k te podés quedar un buen rato, y ahorraste mucho.
+  Cuando te pasás de una página, se genera una excepción, hace el swap y listo.
+
+- Uso de memoria muy bajo.
+
+Como cada proceso ocupa menos memoria => se pueden tener más procesos
+
+* Por qué 4k?
+
+    Las de intel son de 4k, arm de 4k, el único de 8k fue alpha de digital.
+    4k es un nro muy adecuado para el buffer del controlador de disco.
+    Si le mandás 4k la operación es ágil, asi que viene por ahí tambien la mano.
+
+    Cuando escribis a disco escribis en un byffer de memoria del controlador,
+    y 4k es rápido. (Se hace por DMA, después queda de fondo escribiendo)
+
+Modos de paginación
+-------------------
+
+* 32 bits: Nativo: páginas de hasta 4gb
+* PAE: Te permite ir más allá de los 4gb, hasta toda la memoria.
+* IA-32e: Toda la memoria. Antes hay que habilitar PAE
+
+Estructuras
+-----------
+
+Para los segmentos
+* Dirección base: donde arranca
+* Limite: Cuanto mide
+* Atributos: Que puedo hacer
+
+Para las páginas lo mismo
+
+Entonces hay *descriptores de páginas* => otra tabla de descriptores
+
+- No se pueden solapar => comienzan el pos mult. de 4k. Me alcanza con 20 bits
+  (los 20 más significativoks, porque los otros 12 son todos 0)
+- Atributos con los otros 12 bits.
+
+32 bits un descriptor, pero necesito 1 millón.
+Entonces necesito 4mb de memoria por tarea para almacenar sus páginas. Feo
+
+Paginacion por niveles
+~~~~~~~~~~~~~~~~~~~~~~
+
+- Una página mide 4K
+- Un descriptor mide 4B (32 bits)
+- Entran 1K de descriptores en una página
+
+Agarramos una página y le ponemos descriptores de pagina. Como entran 1024,
+puedo direccionar 1K * 4K, 4mb. Justo lo que necesito para una tarea.
+
+Armo un directorio de tablas y una sola tabla.
+Si empieza a pedir más memoria (malloc), voy armando más.
+Siempre te da 4k.
+
+Cada tarea tiene un directorio, y hay un registro que apunta a el (CR3).
+Lo cambias para cada tarea.
+
+1er nivel: Directorio -> 4K
+2do nivel: 1 tabla    -> 4K
+Al menos 8K para cada tarea.
+
+Cada tarea tiene la cantidad de tabla de páginas que necesita. Que una tenga
+muchas quiere decir que las demás tienen pocas.
+
+Nivel 1: Directorio de tablas de paginas
+Nivel 2: Tablas de paginas
+
+
+Vos tenes una unidad que toma la dir lineal, y en base a ella calcula una física.
+No necesariamente al cambiar de página van a estar físicamente consecutivas 
+(otra ventaja), Dentro de una página es consecutiva.
+
+TLB
+~~~
+
+Para evitar ir a memoria a buscar todo.
+
+Es un caché. Almaceno traducciones.
+Cacheo los 20 bits mas significativos de la dir lineal, y al lado el descriptor
+de la págima, y al lado algunos bits de control para hacer LRU y eso.
+
+Lo tengo al lado de la MMU, entonces cuando buscas una dirección lineal
+
+Cuando cambias de tarea, seguro sea todo diferente, entonces esto se limpia todo.

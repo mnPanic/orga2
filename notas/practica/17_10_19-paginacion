@@ -1,0 +1,57 @@
+17/10/19 - Paginacion
+
+Segmentación
+============
+
+..
+Segmentación flat es ..
+
+Paginación
+==========
+
+- Logica segmentación
+- Lineal paginación
+- Física memoria
+
+{figura}
+
+A la unidad de segmentación entra una dirección lógica
+Sale una dirección lineal que va a la unidad de paginación
+Y de ahí sale una dirección física que direcciona la memoria.
+
+Directorio de paginas
+---------------------
+
+PDE (Page Directory Entry)
+
+* P: Present            1
+    Si está o no en memoria principal (si existe o no)
+    Si queremos acceder a una pagina que tenga eso en 0, da page fault.
+* R/W: Read/Write       1
+    Si está en 0 solo se puede leer, si está en 1 read y write
+* U/S: User/Supervisor  0
+    Si está en 1 es usuario, 0 supervisor. Mientras mas chico mas privilegios
+    Nivel 3 mapea a usuario, 0 1 y 2 a supervisor.
+* PWT: Page level write through
+    Saltear la caché y escribir directamente a memoria
+* PCD: Pagel level cache disable
+    Deshabilitar la cache
+* A: Accessed
+* Ignored: 0
+* Page size
+    0 kb 1 4mb
+* Global
+    0 ignored
+    1 disponible
+
+El resto es la direccion base de la tabla, hay que shiftearla 12 bits (ponerle
+todos 0s al final) porque la tabla está alineada a 4k, entonces no es necesario
+usar los 32 bits.
+
+PTE (Page Table Entry)
+Muy parecida a la anterior 
+
+GR3: Descriptor
+
+El bit 31 de CR0 se usa para pasar a paginación, si y solo sí está en 1 el bit
+0 (i.e se está en modo protegido)
