@@ -1,0 +1,240 @@
+24/10/19 - Tareas
+
+Tareas
+======
+
+Quienes las conmutan? Entre el SO y el procesador
+Esta no funciona en forma simultanea, en base a temporizadores, agarra cada
+una y la ejecuta un rato.
+Cada tarea ve que se ejecuta de forma correcta, pero es porque conmutan muchas
+veces por segundo, y uno no se da cuenta.
+
+Scheduler
+---------
+
+Tiene una lista de todas las tareas, y periodicamente mira que tarea está en
+ejecución.
+El scheduler tiene un tiempo t_0 que es el tiempo en el cual se tienen que
+ciclar todas las tareas.
+Vos le das un tiempo a la tarea, que tiene que ver con su prioridad.
+En funcion de la prioridad que tiene esa tarea, les doy un intervalo de tiempo
+dentro del cual van a correr.
+
+Cuando expira el tiempo, suspende la tarea.
+
+En todo momento hay una tarea que se está ejecutando, y una lista de tareas
+que están esperando para ser ejecutada.
+Cuando pasa su tiempo, la suspende (le cambia el estado) y copia los registros
+de la CPU a un area de memoria segura del kernel. Como la tarea no terminó,
+me tengo que guardar todo el estado de la máquina, el *contexto*, para que
+cuando la tenga que resumir pueda llevarla exactamente al punto al que la
+había suspendido.
+Hay un pequeño tiempo contemplado para poder hacer esta transferencia a
+memoria, ya que es pequeño pero no despreciable.
+
+Esto funciona por interrupción, una que está asociada a un temporizador que
+le dice que se fije si la tarea expira.
+
+Como es una interrupción, la instrucción que se está ejecutando se corta.
+
+Después de eso, busca a la siguiente tarea y la pone a ejecutar, para lo cual
+tiene que reestablecer su contexto en memoria. De alguna forma tiene que poder
+indexar dónde está ese contexto.
+En el ciclo de clock siguiente, se resume la tarea.
+
+--
+
+El scheduler tiene una lista doblemente enlazada de tareas a ejecutar.
+La primera es la que está siendo ejecutada, y el resto están en espera.
+Para conmutar entre ellas, el scheduler tiene un tiempo definido en el cual
+tiene que ciclar todas, entonces, le asigna una fracción de ese tiempo a cada
+tarea, el cual depende de su prioridad, y las corre durante ese tiempo.
+(Esto es solo una de las muchas políticas de scheduling que pueden haber)
+
+Luego de que el tiempo de esa tarea expira, debe ser *suspendida*, pero para
+poder resumirla luego, es necesario persistir su *contexto* en un area de
+memoria segura del kernel. Este es el estado de la máquina en ese momento,
+los registros de la CPU, etc.
+El tiempo que tarda esto se le llama tiempo de conmutación.
+
+Para saber cuando el tiempo expira, se maneja mediante interrupciones, lo cual
+garantiza que la instrucción que se está ejecutando va a terminar antes de que
+se suspenda la tarea.
+
+{figura pagina 13}
+
+Tarea
+-----
+
+Cacho de código y de datos. Es una instancia de un programa.
+
+Espacio del contexto de ejecución: Donde se guarda el contexto
+Espacio de ejecución: ?
+
+Arquitectura en intel
+=====================
+
+- TSS: Task Space Segment
+  Segmento dedicado a las tareas, aquí se guarda el contexto
+- Descriptor de TSS
+- Descriptor de Task Gate
+- Registro de tarea
+- Flag NT (bit 14 de EFLAGS)
+
+TSS
+---
+
+Es el único procesador que permite conmutar tareas de maneara automática.
+Vos ejecutás una instrucción y te copia todo.
+
+El TSS implementa el espacio de contexto.
+{Figura de como se almacena en p.16}
+
+Los xmm solo los guardo si se usaron, y se puede saber si se usaron (soon)
+ya que se quiere que el tiempo de conmutación sea lo más chico posible.
+
+~~
+Reminder de interrupciones:
+Con las interrupciones, si la maneja el kernel, hay un cambio automático de
+stack (de nivel 3 a nivel 0, y se guardaba automáticamente)
+Nivel de privilegio 3:
+    Cuando se produce una interrupción, el procesador guarda los flags y la dir
+    de retorno.
+Cuando vas a trabajar en modo kernel, hay una regla de protección que dice que
+los stacks tienen que ser del mismo nivel de privilegio que el código que lo use.
+Porque como los argumentos se pasan por stack, podrías pasarle basura a código
+de kernel y rompés todo el SO.
+
+Nivel de privilegio 0, cuando hay una int, se almacena:
+  - SS (de nivel 3)
+  - ESP (de nivel 3)
+  - EFLAGS
+  - EIP
+  - CS
+
+El procesador entonces puede guardar todo automáticamente porque lo guarda ahí
+~~
+
+Bitmap de E/S
+~~~~~~~~~~~~~
+
+Las tareas no pueden acceder normalmente a los dispositivos de E/S, para
+eso están los drivers. Igual, hay casos en dispositivos rudimentarios en
+donde podría ser útil, por ejemplo una app de comuncación serie.
+
+Se crea entonces el bitmap donde cada posición corresponde a una dir de 
+entrada salida.
+
+Le ponés 0 a todos: Ninguno puede acceder, y cuando quiero acceder a uno le
+pongo 1. Pero antes, hay algunos bits en el registro de flags (IOPL) que son
+el Input Output Privilege Level.
+Para setear el nivel de privilegio, el cambio lo tiene que hacer el kernel, el
+cual también autoriza al usuario root a hacerlo.
+
+Descriptor de TSS
+~~~~~~~~~~~~~~~~~
+
+{{p.18}}
+
+* DPL: 0 - Kernel
+  Es dedicado a la tarea pero es de uso del kernel, la tarea ni lo tiene que ver
+
+* Tipo
+   - B - Busy
+     0: No está en ejecución
+     1: Si está en ejecución
+    Si la llamás cuando está busy si genera una General Protection
+
+Task Gate
+---------
+
+Es un descriptor de sistema pero que no describe un segmento
+Dispara una tarea, aquella cuyo selector de TSS está ahí.
+Ese puede estar en la IDT, lo cual permitiría asociar una tarea con una int.
+
+Ventajas:
+  - La tarea corre en su propio contexto.
+    Le da una cierta robustez en el sentido en que si otras tareas hacen
+    quilombos no le afecta 
+
+Desventajas:
+  - El tiempo de atención es más largo, porque hay que bancarse el tiempo de
+    conmutación
+
+Despacho de tareas
+==================
+
+Podés hacerlo automático o no automático.
+Por ejemplo Linux en 32 bits lo hacen ellos, ya que tienen más control.
+Te da visibilidad de que es lo que explota, porque al ser automático es una
+caja negra que no tenés idea de que carajo hay adentro.
+
+Lo automático es mejor para arrancar, hay que sufrir menos.
+
+Automático
+----------
+
+Formas de despachar una tarea:
+- call
+- jmp
+- int a un handler que tenga una task gate en la IDT
+- Ejecutando IRET en una tarea cuando el flag NT está prendido
+
+En cualquier caso hay que identificar una tarea.
+
+jmp
+~~~
+
+Puedo hacer un jmp o call a un offset dentro de un selector dentro de la GDT
+que sea un TSS, lo cual funciona como una conmutación de tareas.
+
+- Busca el descriptor en la GDT
+- Si es una task gate, es como un paso indirecto a saltar a la TSS
+    Vuelve a la GDT a buscar la TSS
+- Si es un selector de TSS, busca en la GDT el descriptor de TSS.
+- Setea el bit Task Switch (TS) en el CR0. Cada vez que hay un switch se prende
+  Esto es importante aunque ahora parezca un dato menor.
+- Carga el nuevo TR y descriptor
+- Copia el contexto en el nuevo TSS.
+
+Ejemplo de conmutación
+    
+    jmp far sel1:offset
+
+La dirección no importa, porque el lugar a donde tengo que ir está en la TSS;
+le pongas lo que le pongas va a funcionar igual
+
+    jmp far sel1:FRUTA
+
+Hay que poner cualquier cosa porque sino no compila, no lo va a usar
+
+Como hago cuando tengo muchas tareas?
+
+call
+~~~~
+
+> Furfi: No hagan estas cosas porque son muy complejas, un scheduler lo haría
+> con un jump.
+
+Ejemplo
+
+    call far sel1:FRUTA
+
+El call es un viaje de ida y vuelta, a diferencia del jmp.
+El call far guarda la dirección y selector de retorno.
+
+Si `sel1` es un selector de tarea, va a hacer lo mismo con pequeñas diferencias
+Como vuelvo?
+En el TSS hay algo que se llama Previous Task Link, que escribe el selector
+de TSS de la tarea que la llamó, para que pueda volver.
+
+Cuando una tarea llama a otra, la otra corre anidada, por eso NT es Nested
+Task, y NT se setea automaticamente en EFLAGS, luego la tarea que se llama
+en vez de hacer ret hace iret, luego de lo cual se pone en el TSS
+automáticamente lo que estaba en el Task Link.
+En ese momento hay dos tareas busy, ya que la primera tarea cede su tiempo
+de ejecución para que se ejecute la otra anidada.
+
+
+Fin de la clase.
+Pendientes: Que hacemos con los xmm.
