@@ -1,0 +1,191 @@
+31/10/19 - Protección
+
+Protección
+==========
+
+Cuando ponemos PE=1, estamos habilitando mucho hardware, que se encarga de
+que se cumplan muchas reglas.
+
+Se la llama Unidad de Protección pero no es una unidad, es algo que está en
+todos lados. Es como tener 4 gendarmes en cada lugar del procesador
+
+- Chequeo de segmentos
+- Niveles de privilegios de paginas y segmentos
+- Restricción del set de instrucciones
+{mas, copiar p.3}
+
+Chequeo de limite
+-----------------
+
+Tiene en cuenta los atributos
+* G     - Granularidad
+* D/B   - Tamaño del segmento
+* ED    - Expand Down
+
+El límite es el máximo desplazamiento valido dentro del segmento.
+
+Formas de chequear el límite
+* ED = 0
+  El sentido de incremento de los punteros es hacia las direcciones altas,
+  en el cual se fetchea normalmente para adelante (el código tiende a avanzar)
+
+  Entonces cuando se termina el límite, el sueño de intel es que simplemente
+  lo redimencionabas y movias lo que estaba abajo (lo cual es lentísimo)  
+
+* ED = 1
+  El unico así es la pila (ya que el ESP se decrementa, va hacia direcciones
+  bajas).
+
+  Es mala idea {ver diapo}
+
+Chequeo de tipo
+---------------
+
+De segmentos (puede ser de sistema o de datos/codigo)
+
+* S = 1 (no es de sistema)
+  Hay una serie de reestricciones duras, de cosas que no se pueden hacer
+  - Cargar un CS en un segmento de datos
+  - Cargar en cualquier selector de segmento (SS, DS, ES, FS o GS) uno que
+    sea de código con readable = 0 (R=0).
+    Por ejemplo, con esto no se puede hacer un dissasembly.
+  - Cargar en SS (stack segment) un selector cuyo segmento corresponde a
+    un segmento de datos que no sea writable.
+  - Cargar en LDTR algo que no correasponda a la LDT
+  - Cargar en TR algo que no corresponda a un selector de TSS.
+
+- No se puede escribir en un segmento de código (por definición)
+- No se puede leer un segmento de código con R=0
+- No se puede escribir un segmento de datos con W=0
+
+Comprobación de selectores
+
+{y mas cosas, p.11}
+
+Modelo de anillos
+=================
+
+0 < 1 < 2 < 3
+
+Propuesto pr intel:
+- 0: Kernel
+- 1 y 2: Servicios y modulos del kernel
+- 3: Usuario
+
+Usado realmente
+- 0: Kerneñ
+- 1 y 2: Nada
+- 3: Usuario
+
+Tipos de nivel de privilegio:
+- DPL: Descriptor Privilege Level
+    Esta grabado en el descriptor de la GDT.
+
+    Que privilegio tengo que tener para acceder a esa estructura?
+    DPL = 3 -> mínimo nivel de privilegio necesario para acceder es 3.
+
+- CPL: Nivel de privilegio corriente
+    El nivel de privilegio del código que se está ejecutando, lo saca del DPL
+    del segmento de código.
+    
+    Cuando se llama el kernel (o es interrumpido) desde una tarea, cambia el 3
+    por el 0.
+
+- RPL: Requested privilege level
+    No se usa, se usa el EPL
+
+- EPL: Effective privilege level
+  EPL = MAX(CPL, RPL) (el menos privilegiado)
+
+Las tareas _piden_ cierto nivel de privilegio, por ejemplo
+
+    pepe:   dw ...
+            dd ...
+
+    and word [pepe], 0xFFFC ; pone los ultimos 2 bits en 0
+    call far [pepe]         ; salta a pepe solicitando privilegio 0
+
+
+
+Segmentos conforming
+--------------------
+
+Un segmento es confirming cuando uno de menor privilegio puede llamarlo.
+Lo que ocurre en realidad es que el código de ese segmento se ejecuta con el
+nivel de privilego del que lo llamó.
+
+Esto no se usa.
+
+Acceder a servicios del kernel
+==============================
+
+Call gates
+----------
+
+Lo que suelen hacer los programas es llamar al kernel, entonces es necesario
+tener un mecanismo que permita transferir el control de un descriptor de menor
+a uno de mayor privilegio.
+
+Se pueden acceder haciendo call o jump. Típicamente se suele hacer con call,
+porque queremos que vuelva.
+
+Descriptor de la call gate:
+* Parameter count: La cantidad de parámetros que hay que buscar en la pila
+
+              c                     asm
+
+    servicio(arg1, arg2)        push arg1
+                                push arg2
+                                call servicio
+...
+
+Para llamar al kernel
+
+    call far pll_selector:0000      ; el offset está solo para rellenar
+
+Aquí se realiza un cambio de privilegios, con lo cual tiene que haber un cambio
+de pila. Luego de eso pasa en el punto de entrada del código de kernel al que
+llamamos.
+
+Lo bueno de esto es que hay menos overhead que con las interrupciones.
+
+En la práctica, es lo mismo esto que llamar al Kernel mediante interrupciones.
+
+Resumen de cosas
+----------------
+
+{{diagrama p.26}
+
+ARPL
+----
+
+Adjust Requested Privilege Level
+
+    ARPL r/m16, m16
+
+A los numeros de 16 bits para el son dos selectores, y le importan los dos bits
+menos significativos
+
+{p.33}
+
+Instrucciones que no se pueden usar
+----
+
+{p.34}
+
+Protección en paginas
+=====================
+
+Se combina con segmentos. Si llegamos acá es porque paginación anduvo OK.
+
+- Desde modo supervisor se puede leer y escribir cualquier pagina, aunque sea
+  read-only.
+  A partir del siguiente procesador que incuyó paginación, se incuye un bit
+  (WP - Write protect) que hace que se respete el W=0 se respete.
+  Esto sirve para implementar una función que se ve en Sistemas Operativos
+    
+    Copy on write
+
+  que se usa cuando se crea un nuevo proceso.
+
+

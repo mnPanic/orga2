@@ -1,0 +1,75 @@
+31/10/19 - Continuación de Tareas
+
+Tareas
+======
+
+En la TSS faltam cosas,
+- XMM
+- Registros FPU
+
+Eso es porque muy pocas las usan, y si las usan no la usa siempre.
+Por más de que en parte del código la tenga, no siempre está usando los
+registros. Los cuales son muy grandes en comparación a su tamaño.
+Como se quiere que el tiempo de conmutación entre las tareas sea lo mínimo
+posible, no se guarda siempre.
+
+Mecanismo
+---------
+
+Usan excepciones para esto
+
+#NM (tipo 7). Cada vez que el procesador conmuta la tarea, hay un bit TS
+que se pone en 1. Este se pude clerear desde el soft
+
+    CLTS
+
+Cada vez que se cambia una tarea de forma automática, automaticamente se prende
+ese bit.
+Entonces cada vez que va a ejecutar una instrucción que usa un registro xmm o
+de la FPU y está en 1 el bit TS, genera una excepción.
+Entonces en el handler de la interrupción es donde se hace el cambio.
+
+Handler
+~~~~~~~
+
+1) Lo primero que haces es limpiar el bit, para no generar nuevamente una excp.
+2) Se usan instrucciones para guardar de forma automática los registros
+
+    FXSAVE  Permite guardar el contexto de FPU / XMM
+    FXRSTR  Recupera el contexto FPU / XMM
+
+  A ambas se les pasa una posición alineada a 512 bytes
+
+Debe tener trackeo de cual fue la última tarea que utilizó los registros xmm,
+de forma tal de saber si al modificarlo, estaría cambiando un registro que es
+usado también por otra tarea.
+Si es siempre la misma tarea la que lo está modificando, no hace falta que
+haga nada.
+
+Si no es la misma tarea, lo que tengo en los registros xmm lo tengo que guardar
+en el contexto de la tarea que los estaba usando, para después poder
+restaurarlo.
+
+Tareas en 64 bits
+=================
+
+AMD mantiene los conceptos que introdujo intel, pero no mantiene el mecanísmo
+automático.
+El TSS se usa para otra cosa
+
+Conmutación de tareas no soportada, ya que el resto de los procesadores
+no soportan hacerlo automáticamente, sino que es a mano
+Linux en 32 bits tampoco usa el automático
+  
+Ventajas
+- Es más debugeable, ya que en el modo automático cuando explota lo único
+  que se sabe es que el TSS es inválido, mientras que en un código propio
+  uno puede saber exactamente en que instrucción falla.
+  
+- Podés ignorar ciertos registros que no usas para ahorrar en tiempo de
+  conmutación
+
+Desventajas:
+- Tarda un poco más de tiempo ya que hay que ejecutar un código (el que se
+  encarga de hacer lo que normalmente es automático).
+
