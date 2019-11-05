@@ -1,0 +1,106 @@
+Tareas
+
+El contexto en esta materia es el estado del procesador a grandes razgos.
+El estado _arquitectural_
+
+Tarea
+=====
+
+- Segmento de código
+- Segmento de datos (en gral la pila)
+- Segmento de TSS donde es almacenado el contexto
+  El contexto es básicamente una _foto_ de un texto pasado de ejecución.
+  Es valida hasta que se corra devuelta.
+
+{{fig relaciones entre componentes}}
+
+- Hasta ahora solo trabajamos en nivel 0, cuando hagamos el primer task switch
+  vamos a seguir haciendo eso.
+  La tarea Idle sigue corriendo en nivel 0
+- Cuando hagamos lo mismo para tareas de nivel 3, vamos a tener que poner RPL
+  3 en kos segmentos de codigo, datos y de stack.
+
+Nivel 0 no puede escribir en una pila de nivel 3, entonces son necesarios un
+segmento para cada nivel posible.
+
+TSS
+---
+
+Se identifica con su descriptor ubicado en la GDT
+Solo se pueden ejecutar desde nivel 0
+- Es decir, su DPL tiene que ser 0.
+Si no es 0, entonces un usuario puede hacer jump a una tarea, algo que es
+solo del kernel.
+El TR indica cual es el selector de segmento, que apunta a la TSS.
+
+No puedo saltar a una tarea que está `busy`, ya que quiere decir que todavía
+se está ejecutando y no le puedo sacar el contexto ya que no fue copiado.
+
+Composición
+- Selectores
+- CR3
+- EIP
+- EFLAGS
+  Solo se pueden modificar los primeros bits, no el registro entero.
+  Hay flags protegidos, entre ellos el de interrupciones. Desde una tarea no
+  se puede hacer STI o CLI
+
+- SS0: Pila de nivel 0
+  Si la tarea es de nivel 0 (tarea Idle) no es necesario llenarlo, ya que al 
+  atender una interrupción se puede escribir sobre la misma pila
+- ESP: Pila
+  Es muy importante.
+  Como las tareas en el TP son funciones de C, lo primero que hacen es armar
+  el stack frame, entonces es necesario tener el ESP.
+  Si fuese asm, no sería necesario si o si.
+
+Descriptor
+----------
+
+- B: Hay que ver si se prendió para ver si estamos apuntando a la tarea
+     correcta.
+- AVL
+- Base
+- DPL
+- G
+- Limit: Si lo ponemos mas chico explota, tiene que ser al menos 67
+- P
+- TYPE
+
+
+Task switch
+===========
+
+1. Ver si es un selector de una TSS valida
+2. Voy al TR para encontrar el TSS de la tarea actual
+3. Guardo el contexto de la tarea actual en el TSS
+   Le pongo busy en 0
+4. Busco el TSS de la tarea a ejecutar
+5. Restauro el contexto de la tarea a ejecutar
+6. Cargamos el TR para la nueva tarea.
+   Esto implica también poner el bit de busy en 1
+7. Jmp a cs:eip para continuar con la ejecución
+
+Esto lo hace automaticamente el procesador cuando hacemos
+
+    jmp tarea:offset
+
+
+Ej 6
+Al menos tarea inicial y tarea idle, hay un archivo tss.c que tiene definidos
+esas cosas.
+Y tenemos un `tss_inicializar` que tiene que hacer eso.
+Esto es lo mismo que hicimos para las RAI, solo que ahora no tenemos ninguna
+macro, la podemos hacer a mano.
+
+b) En la tarea idle se usa el mismo cr3 del kernel, no es necesario pila de nivel
+   0 porque ya se está en nivel 0.
+
+c) Hay dos maneras de armarlo
+   Solo se pueden tener 12 tareas como máximo porque estan mapeados 1 a 1.
+   - Lo que podríamos hacer es una funcion que inicialize las 12 TSS de 1
+     (recomendado por David)
+
+   - Pool de TSS y buscamos un TSS libre.
+     Como todo es estático no es necesario
+
