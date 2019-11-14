@@ -1,0 +1,57 @@
+Protección
+==========
+
+Cosas de bajo nivel.
+
+Estructuras
+-----------
+
+Logica   ->   Lineal   ->     fisica
+        seg         pag
+
+Mecanismos de protección
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Contexto de protección actual. El programa que va a utilizar la dirección
+  tiene un contexto de privilegios
+- Selector y offset. El selector tiene un RPL (requested privilege level)
+
+AL utilizar una dirección ya estamos declarando nuestro nivel de privilegio
+deseado. Es una _intención_
+
+El kernel los chequea contra los permitidos y los que tenemos actualmente.
+
+Descriptor de GDT
+~~~~~~~~~~~~~~~~~
+
+Que cosas levantan una GPF (ex. 13, general protectio nfault)
+- Acceder a un offset fuera del límite
+- DPL
+
+> Durante la resolución de un ejercicio deberíamos prestarle atención a cada
+> una de las partes del descriptor que puede fallar.
+
+Verificación de dirección
+{{TODO}}
+
+Niveles de privilegio
+~~
+
+* DPL - Descriptor Privilege Level
+    Es el nivel ed privilegio del segmento a ser accedido
+
+* CPL - Current Privilege Level
+    Es el DPL del segmento de codigo que estamos ejecutando
+
+* RPL - Requested Privilege Level
+    Nivel de privilegio marcado por los dos bits menos significativos
+    del selector de segmento.
+
+* EPL - Effective Privilege Level
+    Es el máximo numérico (i.e el de menor privilegio) entre el CPL y el RPL
+    EPL = Max(CPL, RPL)
+
+Nivel adecuado?
+    {{completar}}
+
+ 
