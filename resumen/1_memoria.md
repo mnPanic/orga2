@@ -10,7 +10,7 @@ Tipos de direcciones:
 
 2. **Virtual o Lineal**
 
-   Generalmente coincide con la lógica, aunque puede ser diferente.
+   Generalmente coincide con la física, aunque puede ser diferente.
 
 3. **Logica**
 
