@@ -136,22 +136,22 @@ Atributos
 
     Valor    | Descripción
     -------- | -----------
-    `0x0000` | _Reservado_
-    `0x0001` | TSS de 16 bits disponible
-    `0x0010` | LDT
-    `0x0011` | TSS de 16 bits busy
-    `0x0100` | Call Gate de 16 bits
-    `0x0101` | Task Gate
-    `0x0110` | Interrupt Gate de 16 bits
-    `0x0111` | Trap Gate de 16 bits
-    `0x1000` | _Reservado_
-    `0x1001` | TSS de 32 bits disponible
-    `0x1010` | _Reservado_
-    `0x1011` | TSS de 32 bits busy
-    `0x1100` | Call Gate de 32 bits
-    `0x1101` | Reservado
-    `0x1110` | Interrupt Gate de 32 bits
-    `0x1111` | Trap Gate de 32 bits
+    `0b0000` | _Reservado_
+    `0b0001` | TSS de 16 bits disponible
+    `0b0010` | LDT
+    `0b0011` | TSS de 16 bits busy
+    `0b0100` | Call Gate de 16 bits
+    `0b0101` | Task Gate
+    `0b0110` | Interrupt Gate de 16 bits
+    `0b0111` | Trap Gate de 16 bits
+    `0b1000` | _Reservado_
+    `0b1001` | TSS de 32 bits disponible
+    `0b1010` | _Reservado_
+    `0b1011` | TSS de 32 bits busy
+    `0b1100` | Call Gate de 32 bits
+    `0b1101` | Reservado
+    `0b1110` | Interrupt Gate de 32 bits
+    `0b1111` | Trap Gate de 32 bits
 
 #### Operatoria
 
