@@ -1,6 +1,12 @@
-# CR0
+# Registros
 
-![cr0](img/cr0.png)
+## EFLAGS
+
+![eflags](img/registros/eflags)
+
+## CR0
+
+![cr0](img/registros/cr0.png)
 
 - `PG`: **Paging**
 - `CD`: **Cache Disable**
