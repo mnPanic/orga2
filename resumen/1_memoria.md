@@ -40,9 +40,6 @@ Una dirección en está compuesta de un *selector* de segmento, y un *offset*.
     selector  :  offset
 
 Con lo cual se necesitan 48 bits.
-Para ver a que dirección física le corresponde,
-
-    (selector << 4) + offset
 
 #### Selectores
 
