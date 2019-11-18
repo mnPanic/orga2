@@ -190,3 +190,14 @@ Deben realizar
 3. Realizar la tarea correspondiente
 4. Restaurar los registros con `popad`
 5. Retornar de la interrupción con `iret`
+
+### Instrucciones
+
+- `pushad`
+
+    Pushea `EAX`, `ECX`, `EDX`, `EBX`, `ESP` (original value), `EBP`,
+    `ESI`, y `EDI`.
+
+- `in al/ax/eax imm8`
+
+    Input byte from imm8 I/O port address into AL/AX/EAX.
