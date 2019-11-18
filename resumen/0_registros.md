@@ -2,9 +2,9 @@
 
 ## EFLAGS
 
-![eflags](img/registros/eflags)
+![eflags](img/registros/eflags.png)
 
-## CR0
+## CR0
 
 ![cr0](img/registros/cr0.png)
 

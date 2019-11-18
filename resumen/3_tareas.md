@@ -81,7 +81,7 @@ Para despachar la primera tarea, es necesario crear una **tarea inicial** para
 proveer una TSS en donde el procesador pueda guardar el contexto al momento
 de conmutar la primera.
 
-## Conmutación
+## Conmutación
 
 - El procesador analiza el valor que se debe colocar en el registro CS como
   parte de la ejecución de un `jmp`, `call` o `iret` (con NT = 1).
@@ -96,11 +96,11 @@ de conmutar la primera.
 - Carga el nuevo TR y descriptor
 - Aplica el contexto almacenado en el nuevo TSS.
   
-## Anidamiento
+## Anidamiento
 
 {{TODO}}
 
-## Registros XMM
+## Registros XMM
 
 Los registros xmm no están en la TSS, ya que aumentaría los tiempos de
 conmutación entre tareas.
@@ -115,7 +115,7 @@ Para esto se usan las instrucciones
     fxsave  Guarda en memoria todos los registros xmm (bloque de 512 bytes)
     fxstr   Recupera de memoria los registros xmm
 
-## Scheduler
+## Scheduler
 
 Ejemplo del juego
 

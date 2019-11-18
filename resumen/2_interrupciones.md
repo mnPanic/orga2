@@ -118,7 +118,7 @@ Al hacerse un cambio de privilegio, **se hace un cambio de stack**.
 
 Para retornar de una rutina de atención se debe usar `iret`.
 
-### Código de error
+### Código de error
 
 Está compuesto de 3 bits
 
@@ -149,7 +149,7 @@ Que pasa cuando llega más de una interrupción?
 Detalle sobre los tipos en la sección 6.15 del manual de Intel
 _Systems Programming Guide_.
 
-Vector   | Mnemonic | Description               | Type      | Error Code| Source
+Vector   | Mnemonic | Description               | Type      | Error Code| Source
 -------- | -------- | ------------------------- | --------- | --------- | ------
 0        | `#DE`    | Divide Error              | Fault     | No        | `div`, `idiv`
 1        | `#DB`    | Debug Exception Fault     | Trap      | No        | Instruction, data, and I/O breakpoints; single-step; and others.
@@ -180,7 +180,7 @@ Vector   | Mnemonic | Description               | Type      | Error Code| Sourc
 
 {{TODO}}
 
-## Rutinas de atención
+## Rutinas de atención
 
 Deben realizar
 
