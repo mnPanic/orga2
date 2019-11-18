@@ -1,12 +1,18 @@
-# Registros
+# Arquitectura
 
-## EFLAGS
+## Overview
 
-![eflags](img/registros/eflags.png)
+![Overview de las estructuras de datos](img/arquitectura/overview.png)
 
-## CR0
+## Registros
 
-![cr0](img/registros/cr0.png)
+### EFLAGS
+
+![eflags](img/arquitectura/eflags.png)
+
+### CR0
+
+![cr0](img/arquitectura/cr0.png)
 
 - `PG`: **Paging**
 - `CD`: **Cache Disable**
