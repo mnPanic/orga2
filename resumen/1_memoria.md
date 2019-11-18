@@ -25,6 +25,10 @@ Está compuesta por dos unidades
 - **Unidad de Segmentación** (Logica -> Lineal)
 - **Unidad de Paginación** (Lineal -> Física)
 
+Donde la resolución de direcciones se hace de la siguiente forma:
+
+![resolucion](img/memoria/resolucion.png)
+
 ![dif](img/memoria/comparacion.png)
 ![gen](img/memoria/generacion.png)
 
