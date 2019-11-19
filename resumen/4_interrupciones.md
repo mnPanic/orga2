@@ -105,16 +105,19 @@ será de nivel supervisor, y entonces sucederá un cambio de privilegio.
 
 Al hacerse un cambio de privilegio, **se hace un cambio de stack**.
 
-- Con cambio de privilegio
-  - Se obtiene el `SS` y el `ESP` de la `TSS` de la tarea actual (interrumpida).
-  - Se pushean en el nuevo stack.
-  - Se guarda el estado actual, `EFLAGS`, `CS`, `EIP` en el nuevo stack
-  - Si la excepción hace que se guarde un código de error, se pushea.
-- Sin cambio de privilegio
-  - Se guarda el estado actual, `EFLAGS`, `CS`, `EIP` en el nuevo stack
-  - Si la excepción hace que se guarde un código de error, se pushea.
+Con cambio de privilegio:
 
-<img alt="Uso del Stack" src="img/interrupciones/stack.png" width=588 height=567>
+- Se obtiene el `SS` y el `ESP` de la `TSS` de la tarea actual (interrumpida).
+- Se pushean en el nuevo stack.
+- Se guarda el estado actual, `EFLAGS`, `CS`, `EIP` en el nuevo stack
+- Si la excepción hace que se guarde un código de error, se pushea.
+
+Sin cambio de privilegio:
+
+- Se guarda el estado actual, `EFLAGS`, `CS`, `EIP` en el nuevo stack
+- Si la excepción hace que se guarde un código de error, se pushea.
+
+<img alt="Uso del Stack" src="img/interrupciones/stack.png" width=588 height=567 align="center">
 
 Para retornar de una rutina de atención se debe usar `iret`.
 
@@ -125,15 +128,18 @@ Está compuesto de 3 bits
     0   1   2
     EXT IDT TI
 
-- `EXT`: **External Event**\
+- `EXT`: **External Event**
+
   Indica que la excepción fue causada por un evento externo al procesador.
 
-- `IDT`: **Descriptor Location**\
+- `IDT`: **Descriptor Location**
+
   Indica que el campo Segment Selector Index se refiere a un descriptor de
   gate en la IDT, cuando está en 0 indica que dicho campo se refiere a un
   descriptor en la GDT o en la LDT de la tarea actual.
 
-- `TI`: **Table Indicator** (GDT/LDT)\
+- `TI`: **Table Indicator** (GDT/LDT)
+
   Solo cuando `IDT` está en 0.
   - `0`: GDT
   - `1`: LDT

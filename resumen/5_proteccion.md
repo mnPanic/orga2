@@ -84,7 +84,8 @@ o para prevenir accesos no deseados a segmentos de datos.
 
 <img alt="Modelo de anillos" src="img/proteccion/anillos.png" width=441 height=311>
 
-\
+
+
 Lo menor numérico es lo más privilegiado.
 El uso real que tienen es que todo lo kernel es 0, user 3, y el medio no se usa.
 
@@ -94,7 +95,8 @@ segmento.
 
 #### Tipos
 
-- `DPL`: **Descriptor Privilege Level**\
+- `DPL`: **Descriptor Privilege Level**
+
   Nivel de privilegio del segmento a ser accedido (especificado en el
   descriptor).
 
@@ -105,16 +107,19 @@ segmento.
   - Codigo conforming: Indica el mínimo valor numérico que debe tener el código
     para poder acceder al apuntado.
 
-- `CPL`: **Current Privilege Level**\
+- `CPL`: **Current Privilege Level**
+
   Nivel de privilegio del segmento de código que estamos ejecutando.
   El procesador lo mantiene en el caché hidden del selector, ya que se lo
   leyó directo de la tabla de descriptores.
 
-- `RPL`: **Requested Privilege Level**\
+- `RPL`: **Requested Privilege Level**
+
   Es el valor que se escribe en los primeros dos bits de los selectores.
   Este puede ser cambiado por el programador.
 
-- `EPL`: **Effective Privilege Level**\
+- `EPL`: **Effective Privilege Level**
+
   Se queda con el *menos* privilegiado entre el `CPL` y el `RPL`. (Es decir,
   el máximo numérico)
 
@@ -166,13 +171,15 @@ Cualquier violación al sistema de protección de páginas genera un `#PF`.
 ## Interrupciones
 
 Se tiene el privilegio necesario para hacer `int <type>` si `CPL <= DPL`,
-tomando el `DPL` del descriptor de la IDT. Sino `#GP`.\
+tomando el `DPL` del descriptor de la IDT. Sino `#GP`.
+
 Al tratarse de interrupciones por hardware, se ignoran los bits de `DPL`.
 
 ## Tareas
 
 Para ver si se puede efectuar la conmutación, `CPL <= DPL`, tomando el `DPL` del
-descriptor de la TSS.\
+descriptor de la TSS.
+
 También es necesario que `B = 0` (i.e que no esté corriendo ya).
 
 Sino, `#GP`.

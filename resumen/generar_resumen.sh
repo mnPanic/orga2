@@ -3,7 +3,11 @@
 # Robado de lbarrios: https://github.com/lbarrios/algoritmos3-final/blob/master/resumen/generar_html.sh
 # Con leves modificaciones
 
-cat *.md >> junto.md
+for filename in *.md; do
+	cat $filename >> junto.md
+	cat <(echo) <(echo) >> junto.md
+done
+
 echo "Joined files"
 
 #sed -i 's/[ ]*```/```/g' junto.md
@@ -19,7 +23,6 @@ echo "
 	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="./css/codehilite.css">
 	<link rel="stylesheet" type="text/css" href="./css/github-markdown.css">
-	<link rel="stylesheet" type="text/css" href="./css/custom.css">
 	<style>
 		.markdown-body {
 			box-sizing: border-box;
@@ -44,6 +47,12 @@ cat junto.html >> resumen.html
 
 echo "</article>
 </body></html>" >> resumen.html
+
+echo "Generated html"
+
+wkhtmltopdf resumen.html resumen.pdf
+
+echo "Converted to pdf"
 
 echo "Cleanup"
 rm -f junto.md junto.html

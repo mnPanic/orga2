@@ -8,11 +8,11 @@
 
 ### EFLAGS
 
-<img src="img/arquitectura/eflags.png" alt="EFLAGS" width="600" height="300">
+<img src="img/arquitectura/eflags.png" alt="EFLAGS" width="540" height="270">
 
 ### CR0
 
-<img src="img/arquitectura/cr0.png" alt="CRO" width=675 height=95>
+<img src="img/arquitectura/cr0.png" alt="CRO" width=600 height=95>
 
 
 - `PG`: **Paging**

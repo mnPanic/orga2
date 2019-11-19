@@ -2,9 +2,7 @@
 
 Tipos de direcciones:
 
-1. **Física**
-
-   Es la dirección que será decodificada por el hardware para acceder a
+1. **Física**: Es la dirección que será decodificada por el hardware para acceder a
    memoria RAM o ROM según corresponda. El procesador pone esta dirección en los
    pines de address cuando su UC habilita la salida del bus de direcciones.
 
@@ -41,13 +39,18 @@ Tienen el siguiente formato
 
 Donde,
 
-- `index`: Indice en la tabla de descriptores de segmento.\
+- `index`: Indice en la tabla de descriptores de segmento.
+
   Como tiene 13, bits, cada tabla puede alojar 2^13 descriptores.
-- `TI` - Table Indicator\
+
+- `TI` - **Table Indicator**
+
   Selecciona en que tabla de descriptores debe buscarse.
+
   - `0`: **GDT** (Global Descriptor Table)
   - `1`: **LDT** (Local Descriptor Table) _no se usa nunca_
-- `RPL` - Requested Privilege Level\
+- `RPL` - **Requested Privilege Level**
+
   Nivel de privilegio que declara tener el dueño del segmento.
 
 Selectores disponibles:
@@ -84,7 +87,8 @@ Atributos
 
 - `G`: **Granularity**
   - `0`: El máximo offset es igual al límite
-  - `1`: El limite está expresado en multiplos de 4K.\
+  - `1`: El limite está expresado en multiplos de 4K.
+
     Luego el máximo offset se puede calcular de varias maneras
 
     ```
@@ -101,15 +105,21 @@ Atributos
   en el programador darle el uso apropiado.
 - `P`: **Present**.
   - `1`: El segmento está presente en memoria RAM.
-  - `0`: El segmento está en memoria virtual (disco).\
+  - `0`: El segmento está en memoria virtual (disco).
+
     Esto hace que genere una excepción `#NP` (Segment Not Present) para que
     luego el kernel realice el _swap_ entre el disco y RAM.
-- `DPL`: **Descriptor Privilege Level**.\
+
+- `DPL`: **Descriptor Privilege Level**.
+
   Nivel de privilegio que debe tener el codigo que pretende acceder a este
   segmento, de 0 (más privilegiado) a 3 (menos privilegiado).
-- `S`: **System**, _activo bajo_.\
+
+- `S`: **System**, _activo bajo_.
+
   Define si es un segmento de código/datos o de
   sistema. Determina los valores posibles de `Type`.
+
   - `0`: System.
   - `1`: Codigo / Datos.
 - `Type`: Depende de si es de sistema o de código / datos
@@ -122,13 +132,11 @@ Atributos
       - `E`: **Expand Down**, cuando va a ser utilizado como pila.
         El puntero de direcciones decrece a medida que va expandiendose el
         segmento.
-        {{TODO: Ver en protección}}
       - `W`: **Writable**. Indica si el segmento de datos puede escribirse.
         Si está en `0`, contiene datos pero es Read Only.
     - Code
       - `C`: **Conforming**. Ajustable
         Ajustan su nivel de privilegio al del código que lo invoca.
-        {{TODO: Ver en protección}}
       - `R`: **Readable**
   - System
 
@@ -162,7 +170,6 @@ Atributos
 3. Indexa en la tabla con la parte del selector de segmento que indica el índice
 4. El procesador lee el descriptor de segmento
 5. La **Unidad de protección** realiza sus chequeos
-   {{TODO: Ver en protección}}
 6. El procesador suma el valor del offset contenido en la **dirección lógica**
    con la **dirección base** del segmento, así formando la **dirección lineal**.
 
@@ -219,12 +226,10 @@ Esto llevaría a una tabla de descriptores muy grande, 2^20 descriptores de 4B
 son una tabla de 4MB, y habría una por tarea. Por esto se hace paginación por
 **niveles**.
 
-1. **Page Directory** (PD)\
-   Ocupa 1 página (4KB) con lo cual puede almacenar hasta 4KB / 4B = 1024
-   Page Directory Entries (PDE).
-2. **Page Table** (PT)\
-   Ocupan también 4KB, con lo que pueden almacenar 1024 Page Table Entries (PTE)
-   de 4B cada uno.
+1. **Page Directory** (PD): Ocupa 1 página (4KB) con lo cual puede almacenar
+   hasta 4KB / 4B = 1024 Page Directory Entries (PDE).
+2. **Page Table** (PT): Ocupan también 4KB, con lo que pueden almacenar
+   1024 Page Table Entries (PTE) de 4B cada uno.
 
 Se piensa como un sistema de administración de memoria por tarea, de forma que
 cada una tenga su propia estructura de páginas. Esto robustece la seguridad del
@@ -247,14 +252,12 @@ Tiene dos bits de control de cache
   - **`0`**: PT de 4KB
   - `1`: PT de 4MB
 - `PAT` **Page Attribute Table** (0)
-- `G` **Global**\
-  Hace que no se flushee de la TLB cuando se cambia CR3. (ej. `printf`)
-- `D` **Dirty**\
-  Indica que la página fue modificada. A la hora de desalojar una página de RAM,
-  si no fue modificada no la copia a disco.
-- `A` **Accessed**\
-  Se setea cada vez que la página fue accedida. El SO puede contabilziar los
-  accesos para así saber cual página desalojar de ser necesario.
+- `G` **Global**: Hace que no se flushee de la TLB cuando se cambia CR3.
+- `D` **Dirty**: Indica que la página fue modificada. A la hora de desalojar
+  una página de RAM, si no fue modificada no la copia a disco.
+- `A` **Accessed**: Se setea cada vez que la página fue accedida.
+  El SO puede contabilziar los accesos para así saber cual página desalojar
+  de ser necesario.
 - `U/S` **User / Supervisor**. Privilegio de la página
   - `0`: Supervisor (Kernel). Es equivalente a DPL 0
   - `1`: Usuario. Es equivalente a DPL 1 a 3.
