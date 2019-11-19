@@ -148,8 +148,8 @@ Se combina con segmentación.
 
 Hay dos niveles
 
-- `U/S = 0`: **Usuario** (Corresponde a CPL 0, 1, 2)
-- `U/S = 1`: **Supervisor** (CPL 3)
+- `U/S = 0`: **Supervisor** (Corresponde a CPL 0, 1, 2)
+- `U/S = 1`: **User** (CPL 3)
 
 Cualquier violación al sistema de protección de páginas genera un `#PF`.
 
