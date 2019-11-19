@@ -175,3 +175,30 @@ descriptor de la TSS.\
 También es necesario que `B = 0` (i.e que no esté corriendo ya).
 
 Sino, `#GP`.
+
+## Instrucciones
+
+El Registro `EFLAGS` contiene el campo `IOPL` (bits 12 y 13) que determina el
+nivel de privilegio que debe tener la tarea en curso para acceder a la E/S.
+Luego pueden ejecutarse `IN`, `OUT`, `INS`, `OUTS`, sii CPL = IOPL.
+
+Las instrucciones que en modo protegido solo pueden ejecutarse desde privilegio
+0 son:
+
+- `LGDT` - Cargar registro GDTR
+- `LLDT` - Cargar registro LDTR
+- `LTR` - Cargar registro TR
+- `LIDT` - Cargar Registro IDTR
+- `MOV` - si destino es un Registro deControl
+- `MOV` - si destino es un Registro de Debug
+- `LMSW` - Escribir en el Machine Status
+- `Word` (parte baja de CR0)
+- `CLTS` - Clear Flag Task-Switched en CR0
+- `INVD` - Invalidar Cache sin Write Back
+- `WBINVD` - Invalidar Cache con Write Back
+- `INVLPG` - Invalidar entrada de la TLB
+- `HLT` - Parar el procesador
+- `RDMSR` - Leer Model Specific Register
+- `WRMSR` - Escribir Model Specific Register
+- `RDPMC` - Leer Contador de Monitoreo de Performance
+- `RDTSC` - Leer Time Stamp Counter
