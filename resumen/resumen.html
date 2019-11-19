@@ -26,6 +26,99 @@
 
 <body>
 	<article class=markdown-body>
+<h1 id="orga-ii-systems-programming">Orga II - Systems Programming</h1>
+<p><em>Resumen para el segundo parcial.</em></p>
+<h2 id="contenidos">Contenidos</h2>
+<div class="toc">
+<ul>
+<li><a href="#orga-ii-systems-programming">Orga II - Systems Programming</a><ul>
+<li><a href="#contenidos">Contenidos</a></li>
+</ul>
+</li>
+<li><a href="#arquitectura">Arquitectura</a><ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#registros">Registros</a><ul>
+<li><a href="#eflags">EFLAGS</a></li>
+<li><a href="#cr0">CR0</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#modos">Modos</a><ul>
+<li><a href="#modo-real">Modo real</a></li>
+<li><a href="#modo-protegido">Modo protegido</a></li>
+</ul>
+</li>
+<li><a href="#memoria">Memoria</a><ul>
+<li><a href="#mmu">MMU</a><ul>
+<li><a href="#segmentacion">Segmentación</a></li>
+<li><a href="#paginacion">Paginación</a></li>
+</ul>
+</li>
+<li><a href="#combinacion">Combinación</a></li>
+</ul>
+</li>
+<li><a href="#tareas">Tareas</a><ul>
+<li><a href="#estructuras">Estructuras</a><ul>
+<li><a href="#tss">TSS</a></li>
+<li><a href="#descriptor-de-tss">Descriptor de TSS</a></li>
+<li><a href="#tr">TR</a></li>
+</ul>
+</li>
+<li><a href="#despacho">Despacho</a></li>
+<li><a href="#primera-tarea">Primera tarea</a></li>
+<li><a href="#conmutacion">Conmutación</a></li>
+<li><a href="#anidamiento">Anidamiento</a></li>
+<li><a href="#registros-xmm">Registros XMM</a></li>
+<li><a href="#scheduler">Scheduler</a></li>
+</ul>
+</li>
+<li><a href="#interrupciones">Interrupciones</a><ul>
+<li><a href="#fuentes">Fuentes</a><ul>
+<li><a href="#hardware">Hardware</a></li>
+<li><a href="#software">Software</a></li>
+<li><a href="#internas-excepciones">Internas (Excepciones)</a></li>
+</ul>
+</li>
+<li><a href="#idt">IDT</a></li>
+<li><a href="#vectorizacion">Vectorización</a></li>
+<li><a href="#privilegios-y-stack">Privilegios y stack</a><ul>
+<li><a href="#codigo-de-error">Código de error</a></li>
+</ul>
+</li>
+<li><a href="#prioridades">Prioridades</a></li>
+<li><a href="#tipos-predefinidos">Tipos predefinidos</a></li>
+<li><a href="#pic">PIC</a></li>
+<li><a href="#rutinas-de-atencion">Rutinas de atención</a><ul>
+<li><a href="#instrucciones">Instrucciones</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#proteccion">Protección</a><ul>
+<li><a href="#segmentos">Segmentos</a><ul>
+<li><a href="#limite">Limite</a></li>
+<li><a href="#tipo">Tipo</a></li>
+<li><a href="#selectores-nulos">Selectores nulos</a></li>
+<li><a href="#privilegios">Privilegios</a></li>
+</ul>
+</li>
+<li><a href="#paginacion_1">Paginación</a><ul>
+<li><a href="#privilegios_1">Privilegios</a></li>
+</ul>
+</li>
+<li><a href="#interrupciones_1">Interrupciones</a></li>
+<li><a href="#tareas_1">Tareas</a></li>
+<li><a href="#instrucciones_1">Instrucciones</a></li>
+</ul>
+</li>
+<li><a href="#c">C</a><ul>
+<li><a href="#assembly-inline">Assembly Inline</a></li>
+<li><a href="#macros-con-parametros">Macros con parametros</a></li>
+</ul>
+</li>
+</ul>
+</div>
 <h1 id="arquitectura">Arquitectura</h1>
 <h2 id="overview">Overview</h2>
 <p><img src="img/arquitectura/overview.png" alt ="Overview de las estructuras de datos" width=555 height=585></p>
@@ -100,7 +193,7 @@ selector  :  offset
 
 
 <p>Con lo cual se necesitan 48 bits.</p>
-<h4 id="selectores">Selectores</h4>
+<h4>Selectores</h4>
 <p>Tienen el siguiente formato</p>
 <p><img alt="Selector" src="img/memoria/segmentacion/selector.png" width="423" height="188"></p>
 <p>Donde,</p>
@@ -125,7 +218,7 @@ selector  :  offset
 </ul>
 <p>Estos tienen una parte escondida, donde se guardan datos de caché como
 la base, limite, y detalles de acceso.</p>
-<h4 id="descriptores">Descriptores</h4>
+<h4>Descriptores</h4>
 <p>Los selectores de segmento son una referencia a un <strong>descriptor de segmento</strong>.
 Estos se almacenan en una tabla, ya sea la <strong>GDT</strong> (Global Descriptor Table)
 o la <strong>LDT</strong> (Local Descriptor Table), cuya dirección está especificada en el
@@ -270,8 +363,8 @@ lldt - Load LDT
 </table>
 </li>
 </ul>
-<h4 id="mecanismo">Mecanismo</h4>
-<h5 id="gdt">GDT</h5>
+<h4>Mecanismo</h4>
+<h5>GDT</h5>
 <p><img alt="Mecanismo" src="img/memoria/segmentacion/mecanismo.png" width=800 height=420></p>
 <ol>
 <li>El procesador ve el bit TI para ver a que tabla tiene que ir</li>
@@ -283,14 +376,14 @@ lldt - Load LDT
 <li>El procesador suma el valor del offset contenido en la <strong>dirección lógica</strong>
    con la <strong>dirección base</strong> del segmento, así formando la <strong>dirección lineal</strong>.</li>
 </ol>
-<h5 id="ldt">LDT</h5>
+<h5>LDT</h5>
 <p>En la LDT es parecido, solo que usa el registro <code>LDTR</code> para indexar en la GDT,
 y luego el descriptor le dice donde está la LDT y el offset dentro de la misma
 es tomado del índice de la dirección.</p>
-<h4 id="cache">Cache</h4>
+<h4>Cache</h4>
 <p>El procesador cuenta con registros de cache ocultos para no tener que ir cada
 vez a memoria a buscar las tablas.</p>
-<h4 id="flat">Flat</h4>
+<h4>Flat</h4>
 <p>Un modo que se suele usar es la <em>segmentación flat</em> en la cual todos los
 segmentos abarcan toda la memoria.</p>
 <h3 id="paginacion">Paginación</h3>
@@ -304,7 +397,7 @@ Si no se está en Modo Protegido, entonces se lanza una <code>#GP</code></p>
 <li>IA-32e</li>
 </ul>
 <p>El <strong>tamaño de página</strong> estándar es de 4KB.</p>
-<h4 id="estructuras">Estructuras</h4>
+<h4>Estructuras</h4>
 <p>Es necesario poder almacenar</p>
 <ul>
 <li>Dirección base</li>
@@ -335,14 +428,14 @@ son una tabla de 4MB, y habría una por tarea. Por esto se hace paginación por
 <p>Se piensa como un sistema de administración de memoria por tarea, de forma que
 cada una tenga su propia estructura de páginas. Esto robustece la seguridad del
 SO en la administración de memoria.</p>
-<h5 id="cr3">CR3</h5>
+<h5>CR3</h5>
 <p><img alt="CR3" src="img/memoria/paginacion/cr3.png" width=612 height=70></p>
 <p>Tiene dos bits de control de cache</p>
 <ul>
 <li><code>PWT</code> Page-Level Write Through</li>
 <li><code>PCD</code> Page-Level Cache Disable</li>
 </ul>
-<h5 id="pde-y-pte">PDE y PTE</h5>
+<h5>PDE y PTE</h5>
 <p><img alt="Entries de estructuras" src="img/memoria/paginacion/entries.png" width=832 height=147></p>
 <ul>
 <li><code>PS</code> <strong>Page Size</strong></li>
@@ -375,13 +468,13 @@ SO en la administración de memoria.</p>
 <ul>
 <li><code>PCD y PWT</code> Igual que en CR3</li>
 </ul>
-<h4 id="administracion">Administración</h4>
+<h4>Administración</h4>
 <p>Se inicia una tarea con lo mínimo indispensable, una PD con una sola PT valida,
 y luego se van agregando PTEs dinámicamente, cada una habilitando 4KB más, hasta 
 llegar a 4MB de memoria.
 Llegado a ese límite, si se solicita más, se crea otra PDE, que permite otros
 4MB más.</p>
-<h4 id="traduccion">Traducción</h4>
+<h4>Traducción</h4>
 <p>El procesador necesita conocer para cada tarea la dirección física en donde
 se encuentra el Page Directory. Para esto está el registro de control <code>CR3</code>.</p>
 <p>La <strong>dirección lineal</strong> se divide en tres campos:</p>
@@ -391,7 +484,7 @@ se encuentra el Page Directory. Para esto está el registro de control <code>CR3
 <li>Offset dentro de la página</li>
 </ul>
 <p><img alt="operatoria" src="img/memoria/paginacion/operatoria.png"></p>
-<h4 id="tlb">TLB</h4>
+<h4>TLB</h4>
 <p>Cada vez que se quiere direccionar, es necesario acceder a memoria dos veces
 para leer el PDE y el PTE. Para evitarlo, en la unidad de paginación hay un
 cache de traducciones, el <strong>Translation Lookaside Buffer</strong> (TLB)</p>
@@ -407,12 +500,113 @@ directorio_n  tabla_n   dir_fisica_base
 
 <p>La escritura de un valor en el registro <code>CR3</code> flushea el contenido, excepto
 aquellas entradas que se setean como globales.</p>
-<h4 id="identity-mapping">Identity Mapping</h4>
+<h4>Identity Mapping</h4>
 <p>Es el equivalente a segmentación flat, consiste en que la dirección lineal
 coincida con la física.</p>
 <h2 id="combinacion">Combinación</h2>
 <p>A fin de cuentas para resolver una dirección, se emplean ambos sistemas</p>
 <p><img alt="Combinacion entre Paginación y Segmentación" src="img/memoria/combinacion.png" width=750 height=590></p>
+<h1 id="tareas">Tareas</h1>
+<p>El SO tiene un scheduler que se encarga de conmutar entre una lista de tareas
+a ejecutar, ejecutando cada una por un intervalo fijo de tiempo, por lo general
+atado a interrupciones del clock.</p>
+<ul>
+<li><strong>Tarea</strong>: Es una unidad de trabajo que un procesador puede despachar,
+  ejecutar, y detener a voluntad.</li>
+<li><strong>Espacio de ejecución</strong>: Es el conjunto de segmentos de código, datos y pila
+  que componen a la tarea.</li>
+<li><strong>Contexto de ejecución</strong>: Es el conjunto de valores de los registros internos
+  del procesador. Para poder suspender la ejecución de una tarea y poder
+  resumirla, es necesario almacenarlo.</li>
+<li><strong>Espacio de contexto</strong>: Donde es almacenado el contexto de ejecución.</li>
+</ul>
+<h2 id="estructuras">Estructuras</h2>
+<h3 id="tss">TSS</h3>
+<p>La TSS (Task State Segment) Es el lugar de memoria donde se guarda el contexto
+de cada tarea, su tamaño mínimo es <code>0x68</code> (su mínimo Limit es <code>0x67</code>).</p>
+<p><img alt="TSS" src="img/tareas/tss.png" width=477 height=620></p>
+<p>El <code>EFLAGS</code> por defecto es <code>0x00000002</code> y con interrupciones habilitadas es
+<code>0x00000202</code>.</p>
+<h3 id="descriptor-de-tss">Descriptor de TSS</h3>
+<p><img alt="Descriptor de TSS" src="img/tareas/tss_descriptor.png" width=594 height=371></p>
+<p>El bit <code>B</code> (Busy) sirve para evitar recursividad en el anidamiento de tareas.</p>
+<h3 id="tr">TR</h3>
+<p>En el Task Register se guarda selector de segmento de la GDT donde reside el
+descriptor de TSS de la tarea actual.</p>
+<p><img alt="TR" src="img/tareas/tr.png" width=602 height=593></p>
+<p>Se modifica mediante las instrucciones</p>
+<div class="codehilite"><pre><span></span>ltr     Load Task Register
+str     Store Task Register
+</pre></div>
+
+
+<p>Por ejemplo</p>
+<div class="codehilite"><pre><span></span>mov ax, &lt;selector&gt;
+ltr ax
+</pre></div>
+
+
+<h2 id="despacho">Despacho</h2>
+<p>El procesador puede despachar tareas de las siguientes formas:</p>
+<ul>
+<li><code>call</code> a la tarea.</li>
+<li><code>jmp</code> a la tarea.</li>
+<li>Call a un interrupt-handler task (procesador)</li>
+<li>Call a un exception-handler task (procesador)</li>
+<li>Return con <code>iret</code> cuando está prendido el flag <code>NT</code> de <code>EFLAGS</code></li>
+</ul>
+<p>Por ejemplo, con un <code>jmp</code></p>
+<div class="codehilite"><pre><span></span><span class="nt">jmp</span> <span class="nt">0x20</span><span class="p">:</span><span class="nd">0</span>  <span class="o">;</span> <span class="nt">El</span> <span class="nt">offset</span> <span class="nt">no</span> <span class="nt">importa</span>
+</pre></div>
+
+
+<p>Pero si quisieramos hacerlo a un selector que no se puede poner como constante,
+es necesario hacerlo pasándolo por memoria. Esto es porque es de 48 bits.</p>
+<div class="codehilite"><pre><span></span><span class="n">selector</span><span class="o">:</span>   <span class="mh">0x0000</span>
+<span class="n">offset</span><span class="o">:</span>     <span class="mh">0x00000000</span>
+
+<span class="n">mov</span> <span class="n">ax</span><span class="o">,</span> <span class="n">selector</span>
+<span class="n">jmp</span> <span class="n">far</span> <span class="o">[</span><span class="n">offset</span><span class="o">]</span>        <span class="o">;</span> <span class="n">hacemos</span> <span class="n">jmp</span> <span class="n">a</span> <span class="n">offset</span> <span class="n">porque</span> <span class="n">lo</span> <span class="n">lee</span> <span class="n">como</span> <span class="n">little</span> <span class="n">endian</span>
+</pre></div>
+
+
+<h2 id="primera-tarea">Primera tarea</h2>
+<p>Para despachar la primera tarea, es necesario crear una <strong>tarea inicial</strong> para
+proveer una TSS en donde el procesador pueda guardar el contexto al momento
+de conmutar la primera.</p>
+<h2 id="conmutacion">Conmutación</h2>
+<ul>
+<li>El procesador analiza el valor que se debe colocar en el registro CS como
+  parte de la ejecución de un <code>jmp</code>, <code>call</code> o <code>iret</code> (con NT = 1).
+  o al que obtiene de una interrupt gate o trap gate.</li>
+<li>Busca el descriptor de la TSS en la GDT</li>
+<li>Si es un Task Gate, vuelve a buscar en la GDT donde debe encontrar un
+  descriptor de TSS.</li>
+<li>Si es un selector de TSS lo que intenta cargarse en el CS, busca en la GDT
+  el descriptor de TSS.</li>
+<li>Emplea el TSS actual para almacenar el estado del procesador.</li>
+<li>Setea el bit <code>CR0.TS</code> (Task Switch)</li>
+<li>Carga el nuevo TR y descriptor</li>
+<li>Aplica el contexto almacenado en el nuevo TSS.</li>
+</ul>
+<h2 id="anidamiento">Anidamiento</h2>
+<p>{{TODO}}</p>
+<h2 id="registros-xmm">Registros XMM</h2>
+<p>Los registros xmm no están en la TSS, ya que aumentaría los tiempos de
+conmutación entre tareas.</p>
+<p>Lo que hace entonces el procesador, es que cada vez que ejecuta una instrucción
+que utiliza algún registro xmm, se fija si se realizó un task switch viendo
+el bit <code>CR0.TS</code>. Si hubo, genera una excepción <code>#NM</code>, en cuyo handler se
+switchea el banco de registros, y se limpia <code>CR0.TS</code>.</p>
+<p>Para esto se usan las instrucciones</p>
+<div class="codehilite"><pre><span></span>fxsave  Guarda en memoria todos los registros xmm (bloque de 512 bytes)
+fxstr   Recupera de memoria los registros xmm
+</pre></div>
+
+
+<h2 id="scheduler">Scheduler</h2>
+<p>Ejemplo del juego</p>
+<p><img alt="Ejemplo de scheduler" src="img/tareas/scheduler.png" width=604 height=315></p>
 <h1 id="interrupciones">Interrupciones</h1>
 <p>Las interrupciones pueden provenir de</p>
 <ul>
@@ -440,7 +634,7 @@ consecuencia de una situación que le impide completar la ejecución de la
 instrucción en curso.
 Cada excepción tiene su tipo asociado (predefinido).</p>
 <p><em>Ej: División por cero, page fault, violación de protección, etc.</em></p>
-<h4 id="clasificacion">Clasificación</h4>
+<h4>Clasificación</h4>
 <ul>
 <li>
 <p><strong>Fault</strong></p>
@@ -763,110 +957,9 @@ EXT IDT TI
 <li>
 <p><code>in al/ax/eax imm8</code></p>
 <p>Input byte from imm8 I/O port address into AL/AX/EAX.</p>
-<h1 id="tareas">Tareas</h1>
+<h1 id="proteccion">Protección</h1>
 </li>
 </ul>
-<p>El SO tiene un scheduler que se encarga de conmutar entre una lista de tareas
-a ejecutar, ejecutando cada una por un intervalo fijo de tiempo, por lo general
-atado a interrupciones del clock.</p>
-<ul>
-<li><strong>Tarea</strong>: Es una unidad de trabajo que un procesador puede despachar,
-  ejecutar, y detener a voluntad.</li>
-<li><strong>Espacio de ejecución</strong>: Es el conjunto de segmentos de código, datos y pila
-  que componen a la tarea.</li>
-<li><strong>Contexto de ejecución</strong>: Es el conjunto de valores de los registros internos
-  del procesador. Para poder suspender la ejecución de una tarea y poder
-  resumirla, es necesario almacenarlo.</li>
-<li><strong>Espacio de contexto</strong>: Donde es almacenado el contexto de ejecución.</li>
-</ul>
-<h2 id="estructuras_1">Estructuras</h2>
-<h3 id="tss">TSS</h3>
-<p>La TSS (Task State Segment) Es el lugar de memoria donde se guarda el contexto
-de cada tarea, su tamaño mínimo es <code>0x68</code> (su mínimo Limit es <code>0x67</code>).</p>
-<p><img alt="TSS" src="img/tareas/tss.png" width=477 height=620></p>
-<p>El <code>EFLAGS</code> por defecto es <code>0x00000002</code> y con interrupciones habilitadas es
-<code>0x00000202</code>.</p>
-<h3 id="descriptor-de-tss">Descriptor de TSS</h3>
-<p><img alt="Descriptor de TSS" src="img/tareas/tss_descriptor.png" width=594 height=371></p>
-<p>El bit <code>B</code> (Busy) sirve para evitar recursividad en el anidamiento de tareas.</p>
-<h3 id="tr">TR</h3>
-<p>En el Task Register se guarda selector de segmento de la GDT donde reside el
-descriptor de TSS de la tarea actual.</p>
-<p><img alt="TR" src="img/tareas/tr.png" width=602 height=593></p>
-<p>Se modifica mediante las instrucciones</p>
-<div class="codehilite"><pre><span></span>ltr     Load Task Register
-str     Store Task Register
-</pre></div>
-
-
-<p>Por ejemplo</p>
-<div class="codehilite"><pre><span></span>mov ax, &lt;selector&gt;
-ltr ax
-</pre></div>
-
-
-<h2 id="despacho">Despacho</h2>
-<p>El procesador puede despachar tareas de las siguientes formas:</p>
-<ul>
-<li><code>call</code> a la tarea.</li>
-<li><code>jmp</code> a la tarea.</li>
-<li>Call a un interrupt-handler task (procesador)</li>
-<li>Call a un exception-handler task (procesador)</li>
-<li>Return con <code>iret</code> cuando está prendido el flag <code>NT</code> de <code>EFLAGS</code></li>
-</ul>
-<p>Por ejemplo, con un <code>jmp</code></p>
-<div class="codehilite"><pre><span></span><span class="nt">jmp</span> <span class="nt">0x20</span><span class="p">:</span><span class="nd">0</span>  <span class="o">;</span> <span class="nt">El</span> <span class="nt">offset</span> <span class="nt">no</span> <span class="nt">importa</span>
-</pre></div>
-
-
-<p>Pero si quisieramos hacerlo a un selector que no se puede poner como constante,
-es necesario hacerlo pasándolo por memoria. Esto es porque es de 48 bits.</p>
-<div class="codehilite"><pre><span></span><span class="n">selector</span><span class="o">:</span>   <span class="mh">0x0000</span>
-<span class="n">offset</span><span class="o">:</span>     <span class="mh">0x00000000</span>
-
-<span class="n">mov</span> <span class="n">ax</span><span class="o">,</span> <span class="n">selector</span>
-<span class="n">jmp</span> <span class="n">far</span> <span class="o">[</span><span class="n">offset</span><span class="o">]</span>        <span class="o">;</span> <span class="n">hacemos</span> <span class="n">jmp</span> <span class="n">a</span> <span class="n">offset</span> <span class="n">porque</span> <span class="n">lo</span> <span class="n">lee</span> <span class="n">como</span> <span class="n">little</span> <span class="n">endian</span>
-</pre></div>
-
-
-<h2 id="primera-tarea">Primera tarea</h2>
-<p>Para despachar la primera tarea, es necesario crear una <strong>tarea inicial</strong> para
-proveer una TSS en donde el procesador pueda guardar el contexto al momento
-de conmutar la primera.</p>
-<h2 id="conmutacion">Conmutación</h2>
-<ul>
-<li>El procesador analiza el valor que se debe colocar en el registro CS como
-  parte de la ejecución de un <code>jmp</code>, <code>call</code> o <code>iret</code> (con NT = 1).
-  o al que obtiene de una interrupt gate o trap gate.</li>
-<li>Busca el descriptor de la TSS en la GDT</li>
-<li>Si es un Task Gate, vuelve a buscar en la GDT donde debe encontrar un
-  descriptor de TSS.</li>
-<li>Si es un selector de TSS lo que intenta cargarse en el CS, busca en la GDT
-  el descriptor de TSS.</li>
-<li>Emplea el TSS actual para almacenar el estado del procesador.</li>
-<li>Setea el bit <code>CR0.TS</code> (Task Switch)</li>
-<li>Carga el nuevo TR y descriptor</li>
-<li>Aplica el contexto almacenado en el nuevo TSS.</li>
-</ul>
-<h2 id="anidamiento">Anidamiento</h2>
-<p>{{TODO}}</p>
-<h2 id="registros-xmm">Registros XMM</h2>
-<p>Los registros xmm no están en la TSS, ya que aumentaría los tiempos de
-conmutación entre tareas.</p>
-<p>Lo que hace entonces el procesador, es que cada vez que ejecuta una instrucción
-que utiliza algún registro xmm, se fija si se realizó un task switch viendo
-el bit <code>CR0.TS</code>. Si hubo, genera una excepción <code>#NM</code>, en cuyo handler se
-switchea el banco de registros, y se limpia <code>CR0.TS</code>.</p>
-<p>Para esto se usan las instrucciones</p>
-<div class="codehilite"><pre><span></span>fxsave  Guarda en memoria todos los registros xmm (bloque de 512 bytes)
-fxstr   Recupera de memoria los registros xmm
-</pre></div>
-
-
-<h2 id="scheduler">Scheduler</h2>
-<p>Ejemplo del juego</p>
-<p><img alt="Ejemplo de scheduler" src="img/tareas/scheduler.png" width=604 height=315></p>
-<h1 id="proteccion">Protección</h1>
 <p>Cuando el procesador pasa a <em>modo protegido</em> se pone en funcionamiento la
 <strong>unidad de protección</strong>. Esta supervisa las operaciones internas del
 procesador, comprobando el cumplimiento de una serie de reglas que constituyen
@@ -886,7 +979,7 @@ multitarea.</p>
 <h3 id="limite">Limite</h3>
 <p>Tiene en cuenta los atributos <code>G</code>, <code>D/B</code> y <code>ED</code>.
 Se le llama límite efectivo al resultado de tener todo eso en cuenta.</p>
-<h4 id="sin-ed">Sin ED</h4>
+<h4>Sin ED</h4>
 <p>El limite efectivo será la última dirección a la cual se puede acceder dentro
 del segmento.</p>
 <p>Se fija que el offset al que se quiere acceder no sea mayor al límite <strong>efectivo</strong>. Caso contrario, se genera una excepción <code>#GP</code>.</p>
@@ -896,7 +989,7 @@ del segmento.</p>
 <li>Una <code>word</code> cuyo offset sea mayor al limite efectivo - 1.</li>
 <li>Una <code>quadword</code> cuyo offset sea mayor que limite efectivo - 7.</li>
 </ul>
-<h4 id="con-ed">Con ED</h4>
+<h4>Con ED</h4>
 <p>El limite efectivo es el último offset que no puede ser accedido ya que genera
 una <code>#GP</code>.</p>
 <p>El rango de offsets validos va de</p>
@@ -939,7 +1032,7 @@ El uso real que tienen es que todo lo kernel es 0, user 3, y el medio no se usa.
 <p>Los accesos entre segmentos están regidos por reglas que contemplan los niveles
 de privilegio. Se chequean cuando se carga el selector en el registro de
 segmento.</p>
-<h4 id="tipos">Tipos</h4>
+<h4>Tipos</h4>
 <ul>
 <li>
 <p><code>DPL</code>: <strong>Descriptor Privilege Level</strong>\
@@ -977,7 +1070,7 @@ segmento.</p>
 <p>Esto quiere decir que una tarea no puede hacerse la viva y poner que es kernel
   cuando en realidad es user, porque el CPL lo toma de una caché oculta que no
   tiene forma de modificar. Por lo tanto su EPL seguirá siendo 3.</p>
-<h4 id="nivel-adecuado">Nivel adecuado</h4>
+<h4>Nivel adecuado</h4>
 <p>Para saber si tenemos el nivel adecuado,</p>
 <ul>
 <li>Segmento de datos: <code>EPL &lt;= DLP</code></li>
@@ -1007,7 +1100,7 @@ segmento.</p>
 <li>El procesador chequea la protección en el <em>Page Directory</em> y también en cada
   <em>Page Table</em>.</li>
 </ul>
-<h4 id="combinacion_1">Combinación</h4>
+<h4>Combinación</h4>
 <p><img alt="Combinacion" src="img/proteccion/combinacion.png" width=686 height=444></p>
 <h2 id="interrupciones_1">Interrupciones</h2>
 <p>Se tiene el privilegio necesario para hacer <code>int &lt;type&gt;</code> si <code>CPL &lt;= DPL</code>,
@@ -1088,11 +1181,5 @@ Luego pueden ejecutarse <code>IN</code>, <code>OUT</code>, <code>INS</code>, <co
 <h2 id="macros-con-parametros">Macros con parametros</h2>
 <p>Se pueden hacer defines con parametros</p>
 <div class="codehilite"><pre><span></span><span class="cp">#define PDE_INDEX(virtual) virtual &gt;&gt; 22</span>
-</pre></div>
-
-
-<h1 id="rendereo">Rendereo</h1>
-<p>Para compilar todos los archivos y generar un único pdf,</p>
-<div class="codehilite"><pre><span></span>https://stackoverflow.com/questions/14899283/converting-multiple-markdown-files-with-links-to-pdf
 </pre></div></article>
 </body></html>

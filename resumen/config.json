@@ -1,5 +1,5 @@
 {
     "markdown.extensions.toc": {
-        "title": "Table of Contents"
+        "toc_depth": 3
     }
 }
