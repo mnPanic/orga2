@@ -20,7 +20,9 @@ Está compuesta por dos unidades
 
 Donde la resolución de direcciones se hace de la siguiente forma:
 
+<p align="center">
 <img alt="Resolución de direcciones" src="img/memoria/resolucion.png" width="366" height="52">
+</p>
 
 ### Segmentación
 
@@ -35,7 +37,9 @@ Con lo cual se necesitan 48 bits.
 
 Tienen el siguiente formato
 
+<p align="center">
 <img alt="Selector" src="img/memoria/segmentacion/selector.png" width="423" height="188">
+</p>
 
 Donde,
 
@@ -77,7 +81,9 @@ o la **LDT** (Local Descriptor Table), cuya dirección está especificada en el
 
 El primer descriptor de la tabla debe ser nulo.
 
+<p align="center">
 <img alt="Descriptor" src="img/memoria/segmentacion/descriptor.png" width=600 height=187>
+</p>
 
 - `Base` (Partida en 3) Es la dirección en la cual comienza el segmento.
 - `Limit` Es el máximo offset válido desde la base. (La última dirección válida,
@@ -163,7 +169,9 @@ Atributos
 
 ##### GDT
 
+<p align="center">
 <img alt="Mecanismo" src="img/memoria/segmentacion/mecanismo.png" width=800 height=420>
+</p>
 
 1. El procesador ve el bit TI para ver a que tabla tiene que ir
 2. Como es la GDT, busca en el `GDTR` la dirección base física donde comienza.
@@ -237,7 +245,9 @@ SO en la administración de memoria.
 
 ##### CR3
 
+<p align="center">
 <img alt="CR3" src="img/memoria/paginacion/cr3.png" width=612 height=70>
+</p>
 
 Tiene dos bits de control de cache
 
@@ -246,7 +256,9 @@ Tiene dos bits de control de cache
 
 ##### PDE y PTE
 
+<p align="center">
 <img alt="Entries de estructuras" src="img/memoria/paginacion/entries.png" width=832 height=147>
+</p>
 
 - `PS` **Page Size**
   - **`0`**: PT de 4KB
@@ -327,4 +339,6 @@ coincida con la física.
 
 A fin de cuentas para resolver una dirección, se emplean ambos sistemas
 
+<p align="center">
 <img alt="Combinacion entre Paginación y Segmentación" src="img/memoria/combinacion.png" width=750 height=590>
+</p>

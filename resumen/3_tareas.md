@@ -20,14 +20,18 @@ atado a interrupciones del clock.
 La TSS (Task State Segment) Es el lugar de memoria donde se guarda el contexto
 de cada tarea, su tamaño mínimo es `0x68` (su mínimo Limit es `0x67`).
 
+<p align="center">
 <img alt="TSS" src="img/tareas/tss.png" width=477 height=620>
+</p>
 
 El `EFLAGS` por defecto es `0x00000002` y con interrupciones habilitadas es
 `0x00000202`.
 
 ### Descriptor de TSS
 
+<p align="center">
 <img alt="Descriptor de TSS" src="img/tareas/tss_descriptor.png" width=594 height=371>
+</p>
 
 El bit `B` (Busy) sirve para evitar recursividad en el anidamiento de tareas.
 
@@ -36,7 +40,9 @@ El bit `B` (Busy) sirve para evitar recursividad en el anidamiento de tareas.
 En el Task Register se guarda selector de segmento de la GDT donde reside el
 descriptor de TSS de la tarea actual.
 
+<p align="center">
 <img alt="TR" src="img/tareas/tr.png" width=602 height=593>
+</p>
 
 Se modifica mediante las instrucciones
 
@@ -119,4 +125,6 @@ Para esto se usan las instrucciones
 
 Ejemplo del juego
 
+<p align="center">
 <img alt="Ejemplo de scheduler" src="img/tareas/scheduler.png" width=604 height=315>
+</p>

@@ -76,11 +76,15 @@ Solo tiene 256 entries ya que esa es la cantidad de tipos que reconoce.
 Si se definen en esta tabla descriptores que no sean esos, se genera una `#GP`
 al intentar de vectorizar esa interrupción.
 
+<p align="center">
 <img alt="Descriptores de gates" src="img/interrupciones/gate_descriptors.png" width=600 height=700>
+</p>
 
 Para llegar a la `IDT`, se usa el registro `IDTR`.
 
+<p align="center">
 <img alt="IDTR" src="img/interrupciones/idtr.png" width=624 height=414>
+</p>
 
 ## Vectorización
 
@@ -89,11 +93,15 @@ atención asociada.
 
 En caso de que sea una interrupt o trap gate:
 
+<p align="center">
 <img alt="Vectorizacion Interrupt o Trap Gates" src="img/interrupciones/vectorizacion.png" width=785 height=520>
+</p>
 
 Y si es una task gate
 
+<p align="center">
 <img alt="Vectorizacion Task Gate" src="img/interrupciones/vectorizacion_task.png"  width=785 height=520>
+</p>
 
 ## Privilegios y stack
 
@@ -117,7 +125,9 @@ Sin cambio de privilegio:
 - Se guarda el estado actual, `EFLAGS`, `CS`, `EIP` en el nuevo stack
 - Si la excepción hace que se guarde un código de error, se pushea.
 
+<p align="center">
 <img alt="Uso del Stack" src="img/interrupciones/stack.png" width=588 height=567 align="center">
+</p>
 
 Para retornar de una rutina de atención se debe usar `iret`.
 
@@ -148,7 +158,9 @@ Está compuesto de 3 bits
 
 Que pasa cuando llega más de una interrupción?
 
+<p align="center">
 <img alt="Prioridades" src="img/interrupciones/prioridades.png" width=640 height=640>
+</p>
 
 ## Tipos predefinidos
 

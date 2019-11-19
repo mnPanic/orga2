@@ -82,9 +82,9 @@ o para prevenir accesos no deseados a segmentos de datos.
 
 ### Privilegios
 
+<p align="center">
 <img alt="Modelo de anillos" src="img/proteccion/anillos.png" width=441 height=311>
-
-
+</p>
 
 Lo menor numérico es lo más privilegiado.
 El uso real que tienen es que todo lo kernel es 0, user 3, y el medio no se usa.
@@ -166,7 +166,9 @@ Cualquier violación al sistema de protección de páginas genera un `#PF`.
 
 #### Combinación
 
+<p align="center">
 <img alt="Combinacion" src="img/proteccion/combinacion.png" width=686 height=444>
+</p>
 
 ## Interrupciones
 
