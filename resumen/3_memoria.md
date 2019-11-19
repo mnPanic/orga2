@@ -145,6 +145,7 @@ Atributos
       - `C`: **Conforming**. Ajustable
         Ajustan su nivel de privilegio al del código que lo invoca.
       - `R`: **Readable**
+
   - System
 
     Valor    | Descripción
@@ -277,11 +278,13 @@ Tiene dos bits de control de cache
 
   El procesador chequea el `CPL` del segmento de código para autorizar o no
   el acceso a la página. {{TODO: Protección}}
+
 - `R/W` **Readable / Writable**.
   - `0`: Read Only
   - `1`: Puede ser escrita.
 
   No hay permisos de ejecución.
+
 - `P` **Present**
 
   Indica si la página está en memoria (P=1). En caso de no estarlo, se genera 

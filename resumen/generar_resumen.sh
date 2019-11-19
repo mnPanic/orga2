@@ -50,7 +50,7 @@ echo "</article>
 
 echo "Generated html"
 
-wkhtmltopdf resumen.html resumen.pdf
+wkhtmltopdf resumen.html resumen_orga2_systems_programming.pdf
 
 echo "Converted to pdf"
 
