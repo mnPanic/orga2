@@ -128,6 +128,7 @@ Atributos
 
   - `0`: System.
   - `1`: Codigo / Datos.
+
 - `Type`: Depende de si es de sistema o de código / datos
   - Codigo / Datos
 

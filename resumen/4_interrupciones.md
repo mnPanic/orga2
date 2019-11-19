@@ -170,27 +170,27 @@ _Systems Programming Guide_.
 Vector   | Mnemonic | Description               | Type      | Error Code| Source
 -------- | -------- | ------------------------- | --------- | --------- | ------
 0        | `#DE`    | Divide Error              | Fault     | No        | `div`, `idiv`
-1        | `#DB`    | Debug Exception Fault     | Trap      | No        | Instruction, data, and I/O breakpoints; single-step; and others.
+1        | `#DB`    | Debug Exception Fault     | Trap      | No        | Instruction, data, and I/O breakpoints
 2        | —        | NMI Interrupt             | Interrupt | No        | Nonmaskable external interrupt.
 3        | `#BP`    | Breakpoint                | Trap      | No        | `int3` instruction.
 4        | `#OF`    | Overflow                  | Trap      | No        | `into` instruction.
 5        | `#BR`    | BOUND Range Exceeded      | Fault     | No        | `bound` instruction.
 6        | `#UD`    | Invalid Opcode            | Fault     | No        | `ud` instruction or reserved opcode.
-7        | `#NM`    | Device Not Available      | Fault     | No        | Floating-point or WAIT/FWAIT instruction.
-8        | `#DF`    | Double Fault              | Abort     | Yes (0)   | Any instruction that can generate an exception, an NMI, or an INTR.
-9        | -        | Reserved                  | Fault     | No        | Floating-point instruction.
+7        | `#NM`    | Device Not Available      | Fault     | No        | FP ins WAIT/FWAIT instruction.
+8        | `#DF`    | Double Fault              | Abort     | Yes (0)   | Cualquiera que genere, NMI, o INTR.
+9        | -        | Reserved                  | Fault     | No        | FP ins.
 10       | `#TS`    | Invalid TSS               | Fault     | Yes       | Task switch or TSS access.
-11       | `#NP`    | Segment Not Present       | Fault     | Yes       | Loading segment registers or accessing system segments.
+11       | `#NP`    | Segment Not Present       | Fault     | Yes       | Cargar registros de segmentos o accederlos
 12       | `#SS`    | Stack-Segment Fault       | Fault     | Yes       | Stack operations and SS register loads.
-13       | `#GP`    | General Protection        | Fault     | Yes       | Any memory reference and other protection checks.
+13       | `#GP`    | General Protection        | Fault     | Yes       | Referencias a memoria y checks protección
 14       | `#PF`    | Page Fault                | Fault     | Yes       | Any memory reference.
 15       | —        | Intel reserved.           | -         | No        | -
-16       | `#MF`    | FPU Error                 | Fault     | No        | x87 FPU floating-point or WAIT/FWAIT instruction.
+16       | `#MF`    | FPU Error                 | Fault     | No        | FPU or WAIT/FWAIT instruction.
 17       | `#AC`    | Alignment Check           | Fault     | Yes (0)   | Any data reference in memory.
-18       | `#MC`    | Machine Check             | Abort     | No        | Error codes (if any) and source are model dependent.
+18       | `#MC`    | Machine Check             | Abort     | No        | -
 19       | `#XM`    | SIMD FP Exception         | Fault     | No        | SSE/SSE2/SSE3 floating-point instructions.
 20       | `#VE`    | Virtualization ex.        | Fault     | No        | EPT violations.
-21       | `#CP`    | Control Protection ex.    | Fault     | Yes       | RET, IRET, RSTORSSP, and SETSSBSY instructions can generate this exception. When CET indirect branch tracking is enabled, this exception can be generated due to a missing ENDBRANCH instruction at target of an indirect call or jump.
+21       | `#CP`    | Control Protection ex.    | Fault     | Yes       | -
 22-31    | —        | Intel reserved.           | -         | -         | -
 32-255   | —        | User Defined              | Interrupt | -         | External interrupt or INT n instruction.
 
