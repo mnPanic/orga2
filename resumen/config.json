@@ -1,0 +1,5 @@
+{
+    "markdown.extensions.toc": {
+        "title": "Table of Contents"
+    }
+}
