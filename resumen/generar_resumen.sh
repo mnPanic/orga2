@@ -12,7 +12,7 @@ echo "Joined files"
 
 #sed -i 's/[ ]*```/```/g' junto.md
 
-markdown_py -q -o "html5" -c config.json -x markdown.extensions.toc -x markdown.extensions.tables -x markdown.extensions.fenced_code -x markdown.extensions.codehilite -x pymdownx.mark junto.md > junto.html
+markdown_py -q -o "html5" -c config.json -x mdx_truly_sane_lists -x markdown.extensions.toc -x markdown.extensions.tables -x markdown.extensions.fenced_code -x markdown.extensions.codehilite -x pymdownx.mark junto.md > junto.html
 echo "Converted to html"
 
 echo "
