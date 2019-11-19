@@ -76,11 +76,11 @@ Solo tiene 256 entries ya que esa es la cantidad de tipos que reconoce.
 Si se definen en esta tabla descriptores que no sean esos, se genera una `#GP`
 al intentar de vectorizar esa interrupción.
 
-![Descriptores de gates](img/interrupciones/gate_descriptors.png)
+<img alt="Descriptores de gates" src="img/interrupciones/gate_descriptors.png" width=600 height=700>
 
 Para llegar a la `IDT`, se usa el registro `IDTR`.
 
-![IDTR](img/interrupciones/idtr.png)
+<img alt="IDTR" src="img/interrupciones/idtr.png" width=624 height=414>
 
 ## Vectorización
 
@@ -89,11 +89,11 @@ atención asociada.
 
 En caso de que sea una interrupt o trap gate:
 
-![Vectorizacion Interrupt o Trap](img/interrupciones/vectorizacion.png)
+<img alt="Vectorizacion Interrupt o Trap Gates" src="img/interrupciones/vectorizacion.png" width=785 height=520>
 
 Y si es una task gate
 
-![Vectorizacion Task](img/interrupciones/vectorizacion_task.png)
+<img alt="Vectorizacion Task Gate" src="img/interrupciones/vectorizacion_task.png"  width=785 height=520>
 
 ## Privilegios y stack
 
@@ -114,7 +114,7 @@ Al hacerse un cambio de privilegio, **se hace un cambio de stack**.
   - Se guarda el estado actual, `EFLAGS`, `CS`, `EIP` en el nuevo stack
   - Si la excepción hace que se guarde un código de error, se pushea.
 
-![Uso del Stack](img/interrupciones/stack.png)
+<img alt="Uso del Stack" src="img/interrupciones/stack.png" width=588 height=567>
 
 Para retornar de una rutina de atención se debe usar `iret`.
 
@@ -142,7 +142,7 @@ Está compuesto de 3 bits
 
 Que pasa cuando llega más de una interrupción?
 
-![Prioridades](img/interrupciones/prioridades.png)
+<img alt="Prioridades" src="img/interrupciones/prioridades.png" width=640 height=640>
 
 ## Tipos predefinidos
 

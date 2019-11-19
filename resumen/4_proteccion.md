@@ -82,8 +82,9 @@ o para prevenir accesos no deseados a segmentos de datos.
 
 ### Privilegios
 
-![Modelo de anillos](img/proteccion/anillos.png)
+<img alt="Modelo de anillos" src="img/proteccion/anillos.png" width=441 height=311>
 
+\
 Lo menor numérico es lo más privilegiado.
 El uso real que tienen es que todo lo kernel es 0, user 3, y el medio no se usa.
 
@@ -117,7 +118,7 @@ segmento.
   Se queda con el *menos* privilegiado entre el `CPL` y el `RPL`. (Es decir,
   el máximo numérico)
 
-    EPL = Max(CPL, RPL)
+      EPL = Max(CPL, RPL)
 
   Esto quiere decir que una tarea no puede hacerse la viva y poner que es kernel
   cuando en realidad es user, porque el CPL lo toma de una caché oculta que no
@@ -160,9 +161,9 @@ Cualquier violación al sistema de protección de páginas genera un `#PF`.
 
 #### Combinación
 
-![Combinacion](img/proteccion/combinacion.png)
+<img alt="Combinacion" src="img/proteccion/combinacion.png" width=686 height=444>
 
-## Interrupciones
+## Interrupciones
 
 Se tiene el privilegio necesario para hacer `int <type>` si `CPL <= DPL`,
 tomando el `DPL` del descriptor de la IDT. Sino `#GP`.\

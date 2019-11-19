@@ -9,12 +9,7 @@ Tipos de direcciones:
    pines de address cuando su UC habilita la salida del bus de direcciones.
 
 2. **Virtual o Lineal**
-
-   Generalmente coincide con la lógica, aunque puede ser diferente.
-
 3. **Logica**
-
-   Expresada en términos abstractos por el programador en su código fuente.
 
 ## MMU
 
@@ -27,10 +22,7 @@ Está compuesta por dos unidades
 
 Donde la resolución de direcciones se hace de la siguiente forma:
 
-![resolucion](img/memoria/resolucion.png)
-
-![dif](img/memoria/comparacion.png)
-![gen](img/memoria/generacion.png)
+<img alt="Resolución de direcciones" src="img/memoria/resolucion.png" width="366" height="52">
 
 ### Segmentación
 
@@ -45,14 +37,16 @@ Con lo cual se necesitan 48 bits.
 
 Tienen el siguiente formato
 
-![sel](img/memoria/segmentacion/selector.png)
+<img alt="Selector" src="img/memoria/segmentacion/selector.png" width="423" height="188">
+
+Donde,
 
 - `index`: Indice en la tabla de descriptores de segmento.\
   Como tiene 13, bits, cada tabla puede alojar 2^13 descriptores.
 - `TI` - Table Indicator\
   Selecciona en que tabla de descriptores debe buscarse.
-  - `0` GDT (Global Descriptor Table)
-  - `1` LDT (Local Descriptor Table) _no se usa nunca_
+  - `0`: **GDT** (Global Descriptor Table)
+  - `1`: **LDT** (Local Descriptor Table) _no se usa nunca_
 - `RPL` - Requested Privilege Level\
   Nivel de privilegio que declara tener el dueño del segmento.
 
@@ -65,19 +59,22 @@ Selectores disponibles:
 - `GS`: Datos
 - `FS`: Datos
 
+Estos tienen una parte escondida, donde se guardan datos de caché como
+la base, limite, y detalles de acceso.
+
 #### Descriptores
 
 Los selectores de segmento son una referencia a un **descriptor de segmento**.
 Estos se almacenan en una tabla, ya sea la **GDT** (Global Descriptor Table)
 o la **LDT** (Local Descriptor Table), cuya dirección está especificada en el
-`GDTR`. Para cargarlos,
+`GDTR` y `LDTR`. Para cargarlos,
 
     lgdt - Load GDT
     lldt - Load LDT
 
 El primer descriptor de la tabla debe ser nulo.
 
-![descriptor](img/memoria/segmentacion/descriptor.png)
+<img alt="Descriptor" src="img/memoria/segmentacion/descriptor.png" width=600 height=187>
 
 - `Base` (Partida en 3) Es la dirección en la cual comienza el segmento.
 - `Limit` Es el máximo offset válido desde la base. (La última dirección válida,
@@ -154,11 +151,11 @@ Atributos
     `0b1110` | Interrupt Gate de 32 bits
     `0b1111` | Trap Gate de 32 bits
 
-#### Operatoria
+#### Mecanismo
 
 ##### GDT
 
-![operatoria](img/memoria/segmentacion/operatoria.png)
+<img alt="Mecanismo" src="img/memoria/segmentacion/mecanismo.png" width=800 height=420>
 
 1. El procesador ve el bit TI para ver a que tabla tiene que ir
 2. Como es la GDT, busca en el `GDTR` la dirección base física donde comienza.
@@ -235,7 +232,7 @@ SO en la administración de memoria.
 
 ##### CR3
 
-![cr3](img/memoria/paginacion/cr3.png)
+<img alt="CR3" src="img/memoria/paginacion/cr3.png" width=612 height=70>
 
 Tiene dos bits de control de cache
 
@@ -244,7 +241,7 @@ Tiene dos bits de control de cache
 
 ##### PDE y PTE
 
-![pde_pte](img/memoria/paginacion/pde_pte.png)
+<img alt="Entries de estructuras" src="img/memoria/paginacion/entries.png" width=832 height=147>
 
 - `PS` **Page Size**
   - **`0`**: PT de 4KB
@@ -322,3 +319,9 @@ aquellas entradas que se setean como globales.
 
 Es el equivalente a segmentación flat, consiste en que la dirección lineal
 coincida con la física.
+
+## Combinación
+
+A fin de cuentas para resolver una dirección, se emplean ambos sistemas
+
+<img alt="Combinacion entre Paginación y Segmentación" src="img/memoria/combinacion.png" width=750 height=590>

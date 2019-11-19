@@ -2,17 +2,18 @@
 
 ## Overview
 
-![Overview de las estructuras de datos](img/arquitectura/overview.png)
+<img src="img/arquitectura/overview.png" alt ="Overview de las estructuras de datos" width=555 height=585>
 
 ## Registros
 
 ### EFLAGS
 
-![eflags](img/arquitectura/eflags.png)
+<img src="img/arquitectura/eflags.png" alt="EFLAGS" width="600" height="300">
 
 ### CR0
 
-![cr0](img/arquitectura/cr0.png)
+<img src="img/arquitectura/cr0.png" alt="CRO" width=675 height=95>
+
 
 - `PG`: **Paging**
 - `CD`: **Cache Disable**
