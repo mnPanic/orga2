@@ -346,3 +346,9 @@ A fin de cuentas para resolver una dirección, se emplean ambos sistemas
 <p align="center">
 <img alt="Combinacion entre Paginación y Segmentación" src="img/memoria/combinacion.png" width=750 height=590>
 </p>
+
+## Ejemplo de mapa de memoria
+
+<p align="center">
+<img alt="Mapa de memoria del TP" src="img/memoria/mapa-tp.png" width=500 height=600>
+</p>
