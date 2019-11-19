@@ -519,8 +519,8 @@ SO en la administración de memoria.</p>
 <li>
 <p><code>U/S</code> <strong>User / Supervisor</strong>. Privilegio de la página</p>
 <ul>
-<li><code>0</code>: Supervisor (Kernel). Es equivalente a DPL 0</li>
-<li><code>1</code>: Usuario. Es equivalente a DPL 1 a 3.</li>
+<li><code>0</code>: Supervisor (Kernel). Es equivalente a DPL &lt; 3 (0, 1 y 2).</li>
+<li><code>1</code>: Usuario. Es equivalente a DPL 3.</li>
 </ul>
 <p>El procesador chequea el <code>CPL</code> del segmento de código para autorizar o no
 el acceso a la página. {{TODO: Protección}}</p>

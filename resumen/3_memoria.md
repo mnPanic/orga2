@@ -273,8 +273,8 @@ Tiene dos bits de control de cache
   El SO puede contabilziar los accesos para así saber cual página desalojar
   de ser necesario.
 - `U/S` **User / Supervisor**. Privilegio de la página
-  - `0`: Supervisor (Kernel). Es equivalente a DPL 0
-  - `1`: Usuario. Es equivalente a DPL 1 a 3.
+  - `0`: Supervisor (Kernel). Es equivalente a DPL < 3 (0, 1 y 2).
+  - `1`: Usuario. Es equivalente a DPL 3.
 
   El procesador chequea el `CPL` del segmento de código para autorizar o no
   el acceso a la página. {{TODO: Protección}}

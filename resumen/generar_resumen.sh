@@ -3,6 +3,8 @@
 # Robado de lbarrios: https://github.com/lbarrios/algoritmos3-final/blob/master/resumen/generar_html.sh
 # Con leves modificaciones
 
+#rm -f junto.md junto.html
+
 for filename in *.md; do
 	cat $filename >> junto.md
 	cat <(echo) <(echo) >> junto.md
@@ -10,7 +12,7 @@ done
 
 echo "Joined files"
 
-#sed -i 's/[ ]*```/```/g' junto.md
+sed 's/[ ]*```/```/g' junto.md
 
 markdown_py -q -o "html5" -c config.json -x mdx_truly_sane_lists -x markdown.extensions.toc -x markdown.extensions.tables -x markdown.extensions.fenced_code -x markdown.extensions.codehilite -x pymdownx.mark junto.md > junto.html
 echo "Converted to html"
