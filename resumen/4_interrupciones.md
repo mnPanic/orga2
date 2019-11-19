@@ -194,10 +194,6 @@ Vector   | Mnemonic | Description               | Type      | Error Code| Source
 22-31    | —        | Intel reserved.           | -         | -         | -
 32-255   | —        | User Defined              | Interrupt | -         | External interrupt or INT n instruction.
 
-## PIC
-
-{{TODO}}
-
 ## Rutinas de atención
 
 Deben realizar
