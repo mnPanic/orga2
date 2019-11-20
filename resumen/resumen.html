@@ -1,0 +1,1321 @@
+
+<!DOCTYPE html>
+<html lang=en>
+<head>
+	<meta name=viewport content=width=device-width, initial-scale=1>
+	<meta charset=utf-8>
+	<link rel=stylesheet type=text/css href=./css/codehilite.css>
+	<link rel=stylesheet type=text/css href=./css/github-markdown.css>
+	<style>
+		.markdown-body {
+			box-sizing: border-box;
+			min-width: 200px;
+			max-width: 980px;
+			margin: 0 auto;
+			padding: 45px;
+		}
+
+		@media (max-width: 767px) {
+			.markdown-body {
+				padding: 15px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<article class=markdown-body>
+<h1 id="orga-ii-systems-programming">Orga II - Systems Programming</h1>
+<p><em>Resumen para el segundo parcial.</em></p>
+<h2 id="contenidos">Contenidos</h2>
+<div class="toc">
+<ul>
+<li><a href="#orga-ii-systems-programming">Orga II - Systems Programming</a><ul>
+<li><a href="#contenidos">Contenidos</a></li>
+</ul>
+</li>
+<li><a href="#arquitectura">Arquitectura</a><ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#registros">Registros</a><ul>
+<li><a href="#eflags">EFLAGS</a></li>
+<li><a href="#cr0">CR0</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#modos">Modos</a><ul>
+<li><a href="#modo-real">Modo real</a></li>
+<li><a href="#modo-protegido">Modo protegido</a></li>
+</ul>
+</li>
+<li><a href="#memoria">Memoria</a><ul>
+<li><a href="#mmu">MMU</a><ul>
+<li><a href="#segmentacion">Segmentación</a></li>
+<li><a href="#paginacion">Paginación</a></li>
+</ul>
+</li>
+<li><a href="#combinacion">Combinación</a></li>
+<li><a href="#ejemplo-de-mapa-de-memoria">Ejemplo de mapa de memoria</a></li>
+</ul>
+</li>
+<li><a href="#tareas">Tareas</a><ul>
+<li><a href="#estructuras">Estructuras</a><ul>
+<li><a href="#tss">TSS</a></li>
+<li><a href="#descriptor-de-tss">Descriptor de TSS</a></li>
+<li><a href="#tr">TR</a></li>
+</ul>
+</li>
+<li><a href="#despacho">Despacho</a></li>
+<li><a href="#primera-tarea">Primera tarea</a></li>
+<li><a href="#conmutacion">Conmutación</a></li>
+<li><a href="#anidamiento">Anidamiento</a></li>
+<li><a href="#registros-xmm">Registros XMM</a></li>
+<li><a href="#scheduler">Scheduler</a></li>
+</ul>
+</li>
+<li><a href="#interrupciones">Interrupciones</a><ul>
+<li><a href="#fuentes">Fuentes</a><ul>
+<li><a href="#hardware">Hardware</a></li>
+<li><a href="#software">Software</a></li>
+<li><a href="#internas-excepciones">Internas (Excepciones)</a></li>
+</ul>
+</li>
+<li><a href="#idt">IDT</a></li>
+<li><a href="#vectorizacion">Vectorización</a></li>
+<li><a href="#privilegios-y-stack">Privilegios y stack</a><ul>
+<li><a href="#codigo-de-error">Código de error</a></li>
+</ul>
+</li>
+<li><a href="#prioridades">Prioridades</a></li>
+<li><a href="#tipos-predefinidos">Tipos predefinidos</a></li>
+<li><a href="#rutinas-de-atencion">Rutinas de atención</a><ul>
+<li><a href="#instrucciones">Instrucciones</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#proteccion">Protección</a><ul>
+<li><a href="#segmentos">Segmentos</a><ul>
+<li><a href="#limite">Limite</a></li>
+<li><a href="#tipo">Tipo</a></li>
+<li><a href="#selectores-nulos">Selectores nulos</a></li>
+<li><a href="#privilegios">Privilegios</a></li>
+</ul>
+</li>
+<li><a href="#paginacion_1">Paginación</a><ul>
+<li><a href="#privilegios_1">Privilegios</a></li>
+</ul>
+</li>
+<li><a href="#interrupciones_1">Interrupciones</a></li>
+<li><a href="#tareas_1">Tareas</a></li>
+<li><a href="#instrucciones_1">Instrucciones</a></li>
+</ul>
+</li>
+<li><a href="#c">C</a><ul>
+<li><a href="#assembly-inline">Assembly Inline</a></li>
+<li><a href="#macros-con-parametros">Macros con parametros</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="arquitectura">Arquitectura</h1>
+<h2 id="overview">Overview</h2>
+<p align="center">
+<img src="img/arquitectura/overview.png" alt ="Overview de las estructuras de datos" width=555 height=585>
+</p>
+
+<h2 id="registros">Registros</h2>
+<h3 id="eflags">EFLAGS</h3>
+<p align="center">
+<img src="img/arquitectura/eflags.png" alt="EFLAGS" width="540" height="270">
+</p>
+
+<h3 id="cr0">CR0</h3>
+<p align="center">
+<img src="img/arquitectura/cr0.png" alt="CRO" width=600 height=95>
+</p>
+
+<ul>
+<li><code>PG</code>: <strong>Paging</strong></li>
+<li><code>CD</code>: <strong>Cache Disable</strong></li>
+<li><code>NW</code>: <strong>Not Write Through</strong></li>
+<li><code>AM</code>: <strong>Alignment Mask</strong></li>
+<li><code>WP</code>: <strong>Write Protect</strong></li>
+<li><code>NE</code>: <strong>Numeric Error</strong></li>
+<li><code>ET</code>: <strong>Extension Type</strong></li>
+<li><code>TS</code>: <strong>Task Switched</strong></li>
+<li><code>EM</code>: <strong>Emulation</strong></li>
+<li><code>MP</code>: <strong>Monitor Coprocessor</strong></li>
+<li><code>PE</code>: <strong>Protection Enable</strong></li>
+</ul>
+<h1 id="modos">Modos</h1>
+<h2 id="modo-real">Modo real</h2>
+<p>Para pasar de dirección lógica a física en modo real,</p>
+<div class="codehilite"><pre><span></span>cs &lt;&lt; 4 + offset
+</pre></div>
+
+
+<p>Esto es porque las direcciones son de 20 bits, y el selector de segmento son 16.</p>
+<h2 id="modo-protegido">Modo protegido</h2>
+<p>Para cambiar de modo <strong>real</strong> a <strong>protegido</strong>,</p>
+<ol>
+<li>Setear el bit <code>PE</code> de CR0</li>
+</ol>
+<div class="codehilite"><pre><span></span>mov eax, cr0    ; Copia del valor de CR0 para setear el bit
+or eax, 1       ; Prender el primer bit
+mov cr0, eax    ; Persistir el valor en CR0
+</pre></div>
+
+
+<ol>
+<li>Jump far a la siguiente instrucción</li>
+</ol>
+<div class="codehilite"><pre><span></span>jmp &lt;selector&gt;:&lt;offset&gt;
+</pre></div>
+
+
+<h1 id="memoria">Memoria</h1>
+<p>Tipos de direcciones:</p>
+<ol>
+<li>
+<p><strong>Física</strong>: Es la dirección que será decodificada por el hardware para acceder a
+   memoria RAM o ROM según corresponda. El procesador pone esta dirección en los
+   pines de address cuando su UC habilita la salida del bus de direcciones.</p>
+</li>
+<li>
+<p><strong>Virtual o Lineal</strong></p>
+</li>
+<li><strong>Logica</strong></li>
+</ol>
+<h2 id="mmu">MMU</h2>
+<p>La MMU (Memory Management Unit) es la encargada de traducir direcciones.</p>
+<p>Está compuesta por dos unidades</p>
+<ul>
+<li><strong>Unidad de Segmentación</strong> (Logica -&gt; Lineal)</li>
+<li><strong>Unidad de Paginación</strong> (Lineal -&gt; Física)</li>
+</ul>
+<p>Donde la resolución de direcciones se hace de la siguiente forma:</p>
+<p align="center">
+<img alt="Resolución de direcciones" src="img/memoria/resolucion.png" width="366" height="52">
+</p>
+
+<h3 id="segmentacion">Segmentación</h3>
+<p>Una dirección en está compuesta de un <em>selector</em> de segmento, y un <em>offset</em>.</p>
+<div class="codehilite"><pre><span></span>15     0     31   0
+selector  :  offset
+</pre></div>
+
+
+<p>Con lo cual se necesitan 48 bits.</p>
+<h4>Selectores</h4>
+<p>Tienen el siguiente formato</p>
+<p align="center">
+<img alt="Selector" src="img/memoria/segmentacion/selector.png" width="423" height="188">
+</p>
+
+<p>Donde,</p>
+<ul>
+<li>
+<p><code>index</code>: Indice en la tabla de descriptores de segmento.</p>
+<p>Como tiene 13, bits, cada tabla puede alojar 2^13 descriptores.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>TI</code> - <strong>Table Indicator</strong></p>
+<p>Selecciona en que tabla de descriptores debe buscarse.</p>
+<ul>
+<li><code>0</code>: <strong>GDT</strong> (Global Descriptor Table)</li>
+<li><code>1</code>: <strong>LDT</strong> (Local Descriptor Table) <em>no se usa nunca</em></li>
+<li><code>RPL</code> - <strong>Requested Privilege Level</strong></li>
+</ul>
+<p>Nivel de privilegio que declara tener el dueño del segmento.</p>
+</li>
+</ul>
+<p>Selectores disponibles:</p>
+<ul>
+<li><code>CS</code>: Code Segment</li>
+<li><code>SS</code>: Stack Segment</li>
+<li><code>DS</code>: Data Segment (default)</li>
+<li><code>ES</code>: Datos</li>
+<li><code>GS</code>: Datos</li>
+<li><code>FS</code>: Datos</li>
+</ul>
+<p>Estos tienen una parte escondida, donde se guardan datos de caché como
+la base, limite, y detalles de acceso.</p>
+<h4>Descriptores</h4>
+<p>Los selectores de segmento son una referencia a un <strong>descriptor de segmento</strong>.
+Estos se almacenan en una tabla, ya sea la <strong>GDT</strong> (Global Descriptor Table)
+o la <strong>LDT</strong> (Local Descriptor Table), cuya dirección está especificada en el
+<code>GDTR</code> y <code>LDTR</code>. Para cargarlos,</p>
+<div class="codehilite"><pre><span></span>lgdt - Load GDT
+lldt - Load LDT
+</pre></div>
+
+
+<p>El primer descriptor de la tabla debe ser nulo.</p>
+<p align="center">
+<img alt="Descriptor" src="img/memoria/segmentacion/descriptor.png" width=600 height=187>
+</p>
+
+<ul>
+<li><code>Base</code> (Partida en 3) Es la dirección en la cual comienza el segmento.</li>
+<li><code>Limit</code> Es el máximo offset válido desde la base. (La última dirección válida,
+  el tamaño del segmento - 1)</li>
+</ul>
+<p>Atributos</p>
+<ul>
+<li><code>G</code>: <strong>Granularity</strong><ul>
+<li><code>0</code>: El máximo offset es igual al límite</li>
+<li>
+<p><code>1</code>: El limite está expresado en multiplos de 4K.</p>
+<p>Luego el máximo offset se puede calcular de varias maneras</p>
+<p><code>((limit + 1) * 4kb) - 1
+((limit + 1) &lt;&lt; 12) - 1
+(limit &lt;&lt; 12) + 0xFFF</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><code>D/B</code>: <strong>Default / Big</strong><ul>
+<li><code>0</code>: Default, segmento de 16 bits.</li>
+<li><code>1</code>: Big, segmento de 32 bits.</li>
+</ul>
+</li>
+<li><code>L</code>: Solo utilizado en IA-32e.</li>
+<li><code>AVL</code>: <strong>Available</strong>. No es usado para ningún proposito en específico, queda
+  en el programador darle el uso apropiado.</li>
+<li><code>P</code>: <strong>Present</strong>.<ul>
+<li><code>1</code>: El segmento está presente en memoria RAM.</li>
+<li>
+<p><code>0</code>: El segmento está en memoria virtual (disco).</p>
+<p>Esto hace que genere una excepción <code>#NP</code> (Segment Not Present) para que
+luego el kernel realice el <em>swap</em> entre el disco y RAM.</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>DPL</code>: <strong>Descriptor Privilege Level</strong>.</p>
+<p>Nivel de privilegio que debe tener el codigo que pretende acceder a este
+segmento, de 0 (más privilegiado) a 3 (menos privilegiado).</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>S</code>: <strong>System</strong>, <em>activo bajo</em>.</p>
+<p>Define si es un segmento de código/datos o de
+sistema. Determina los valores posibles de <code>Type</code>.</p>
+<ul>
+<li><code>0</code>: System.</li>
+<li><code>1</code>: Codigo / Datos.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>Type</code>: Depende de si es de sistema o de código / datos</p>
+<ul>
+<li>
+<p>Codigo / Datos</p>
+<p><img alt="type" src="img/memoria/segmentacion/tipos.png"></p>
+<ul>
+<li><code>A</code>: Accesed</li>
+<li>Data<ul>
+<li><code>E</code>: <strong>Expand Down</strong>, cuando va a ser utilizado como pila.
+  El puntero de direcciones decrece a medida que va expandiendose el
+  segmento.</li>
+<li><code>W</code>: <strong>Writable</strong>. Indica si el segmento de datos puede escribirse.
+  Si está en <code>0</code>, contiene datos pero es Read Only.</li>
+</ul>
+</li>
+<li>Code<ul>
+<li><code>C</code>: <strong>Conforming</strong>. Ajustable
+  Ajustan su nivel de privilegio al del código que lo invoca.</li>
+<li><code>R</code>: <strong>Readable</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<p>System</p>
+<table>
+<thead>
+<tr>
+<th>Valor</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0b0000</code></td>
+<td><em>Reservado</em></td>
+</tr>
+<tr>
+<td><code>0b0001</code></td>
+<td>TSS de 16 bits disponible</td>
+</tr>
+<tr>
+<td><code>0b0010</code></td>
+<td>LDT</td>
+</tr>
+<tr>
+<td><code>0b0011</code></td>
+<td>TSS de 16 bits busy</td>
+</tr>
+<tr>
+<td><code>0b0100</code></td>
+<td>Call Gate de 16 bits</td>
+</tr>
+<tr>
+<td><code>0b0101</code></td>
+<td>Task Gate</td>
+</tr>
+<tr>
+<td><code>0b0110</code></td>
+<td>Interrupt Gate de 16 bits</td>
+</tr>
+<tr>
+<td><code>0b0111</code></td>
+<td>Trap Gate de 16 bits</td>
+</tr>
+<tr>
+<td><code>0b1000</code></td>
+<td><em>Reservado</em></td>
+</tr>
+<tr>
+<td><code>0b1001</code></td>
+<td>TSS de 32 bits disponible</td>
+</tr>
+<tr>
+<td><code>0b1010</code></td>
+<td><em>Reservado</em></td>
+</tr>
+<tr>
+<td><code>0b1011</code></td>
+<td>TSS de 32 bits busy</td>
+</tr>
+<tr>
+<td><code>0b1100</code></td>
+<td>Call Gate de 32 bits</td>
+</tr>
+<tr>
+<td><code>0b1101</code></td>
+<td>Reservado</td>
+</tr>
+<tr>
+<td><code>0b1110</code></td>
+<td>Interrupt Gate de 32 bits</td>
+</tr>
+<tr>
+<td><code>0b1111</code></td>
+<td>Trap Gate de 32 bits</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</li>
+</ul>
+<h4>Mecanismo</h4>
+<h5>GDT</h5>
+<p align="center">
+<img alt="Mecanismo" src="img/memoria/segmentacion/mecanismo.png" width=800 height=420>
+</p>
+
+<ol>
+<li>El procesador ve el bit TI para ver a que tabla tiene que ir</li>
+<li>Como es la GDT, busca en el <code>GDTR</code> la dirección base física donde comienza.</li>
+<li>Indexa en la tabla con la parte del selector de segmento que indica el índice</li>
+<li>El procesador lee el descriptor de segmento</li>
+<li>La <strong>Unidad de protección</strong> realiza sus chequeos</li>
+<li>El procesador suma el valor del offset contenido en la <strong>dirección lógica</strong>
+   con la <strong>dirección base</strong> del segmento, así formando la <strong>dirección lineal</strong>.</li>
+</ol>
+<h5>LDT</h5>
+<p>En la LDT es parecido, solo que usa el registro <code>LDTR</code> para indexar en la GDT,
+y luego el descriptor le dice donde está la LDT y el offset dentro de la misma
+es tomado del índice de la dirección.</p>
+<h4>Cache</h4>
+<p>El procesador cuenta con registros de cache ocultos para no tener que ir cada
+vez a memoria a buscar las tablas.</p>
+<h4>Flat</h4>
+<p>Un modo que se suele usar es la <em>segmentación flat</em> en la cual todos los
+segmentos abarcan toda la memoria.</p>
+<h3 id="paginacion">Paginación</h3>
+<p>Para habilitarla, hay que setear en 1 el bit 31 del <code>CRO</code>, <code>PG</code>.
+Si no se está en Modo Protegido, entonces se lanza una <code>#GP</code></p>
+<p>Tiene distintos modos</p>
+<ul>
+<li>32 bits: Es el modo original del 80386.</li>
+<li>PSE: Permite tener tamaños de página mayores</li>
+<li>PAE</li>
+<li>IA-32e</li>
+</ul>
+<p>El <strong>tamaño de página</strong> estándar es de 4KB.</p>
+<h4>Estructuras</h4>
+<p>Es necesario poder almacenar</p>
+<ul>
+<li>Dirección base<ul>
+<li>Cada página comienza en una dirección siguiente a la del último byte de la
+  anterior. Osea que inician en direcciones alineadas a 4KB.</li>
+<li>Como 4KB = 2^12, los 12 bits menos significativos de la dirección son
+  siempre 0.</li>
+<li>Se le llama entonces <strong>page frame</strong> a los bits mas significativos, que
+  determinan la base.</li>
+</ul>
+</li>
+<li>Limite: No es necesario especificarlo pues tienen tamaño fijo.</li>
+<li>Atributos</li>
+</ul>
+<p>Entonces con 20 bits para la dirección base, 12 bits para los atributos se
+puede conformar un descriptor de páginas de 32 bits.</p>
+<p>Como las páginas son de 4KB, (2^12 bytes), al dividir el espacio lineal de 4GB
+(2^32) en páginas quedan 2^20.
+Esto llevaría a una tabla de descriptores muy grande, 2^20 descriptores de 4B
+son una tabla de 4MB, y habría una por tarea. Por esto se hace paginación por
+<strong>niveles</strong>.</p>
+<ol>
+<li><strong>Page Directory</strong> (PD): Ocupa 1 página (4KB) con lo cual puede almacenar
+   hasta 4KB / 4B = 1024 Page Directory Entries (PDE).</li>
+<li><strong>Page Table</strong> (PT): Ocupan también 4KB, con lo que pueden almacenar
+   1024 Page Table Entries (PTE) de 4B cada uno.</li>
+</ol>
+<p>Se piensa como un sistema de administración de memoria por tarea, de forma que
+cada una tenga su propia estructura de páginas. Esto robustece la seguridad del
+SO en la administración de memoria.</p>
+<h5>CR3</h5>
+<p align="center">
+<img alt="CR3" src="img/memoria/paginacion/cr3.png" width=612 height=70>
+</p>
+
+<p>Tiene dos bits de control de cache</p>
+<ul>
+<li><code>PWT</code> Page-Level Write Through</li>
+<li><code>PCD</code> Page-Level Cache Disable</li>
+</ul>
+<h5>PDE y PTE</h5>
+<p align="center">
+<img alt="Entries de estructuras" src="img/memoria/paginacion/entries.png" width=832 height=147>
+</p>
+
+<ul>
+<li><code>PS</code> <strong>Page Size</strong><ul>
+<li><strong><code>0</code></strong>: PT de 4KB</li>
+<li><code>1</code>: PT de 4MB</li>
+</ul>
+</li>
+<li><code>PAT</code> <strong>Page Attribute Table</strong> (0)</li>
+<li><code>G</code> <strong>Global</strong>: Hace que no se flushee de la TLB cuando se cambia CR3.</li>
+<li><code>D</code> <strong>Dirty</strong>: Indica que la página fue modificada. A la hora de desalojar
+  una página de RAM, si no fue modificada no la copia a disco.</li>
+<li><code>A</code> <strong>Accessed</strong>: Se setea cada vez que la página fue accedida.
+  El SO puede contabilziar los accesos para así saber cual página desalojar
+  de ser necesario.</li>
+<li>
+<p><code>U/S</code> <strong>User / Supervisor</strong>. Privilegio de la página</p>
+<ul>
+<li><code>0</code>: Supervisor (Kernel). Es equivalente a DPL &lt; 3 (0, 1 y 2).</li>
+<li><code>1</code>: Usuario. Es equivalente a DPL 3.</li>
+</ul>
+<p>El procesador chequea el <code>CPL</code> del segmento de código para autorizar o no
+el acceso a la página. {{TODO: Protección}}</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>R/W</code> <strong>Readable / Writable</strong>.</p>
+<ul>
+<li><code>0</code>: Read Only</li>
+<li><code>1</code>: Puede ser escrita.</li>
+</ul>
+<p>No hay permisos de ejecución.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>P</code> <strong>Present</strong></p>
+<p>Indica si la página está en memoria (P=1). En caso de no estarlo, se genera 
+una excepción <code>#PF</code> (Page Fault) cuando se intenta acceder a una dirección que
+tenga al menos un P=0 a lo largo de las estructuras.</p>
+<p><strong>Tiene que estar en 1 cuando la configuramos.</strong></p>
+</li>
+</ul>
+<ul>
+<li><code>PCD y PWT</code> Igual que en CR3</li>
+</ul>
+<h4>Administración</h4>
+<p>Se inicia una tarea con lo mínimo indispensable, una PD con una sola PT valida,
+y luego se van agregando PTEs dinámicamente, cada una habilitando 4KB más, hasta 
+llegar a 4MB de memoria.
+Llegado a ese límite, si se solicita más, se crea otra PDE, que permite otros
+4MB más.</p>
+<h4>Traducción</h4>
+<p>El procesador necesita conocer para cada tarea la dirección física en donde
+se encuentra el Page Directory. Para esto está el registro de control <code>CR3</code>.</p>
+<p>La <strong>dirección lineal</strong> se divide en tres campos:</p>
+<ul>
+<li>Indice en el PD</li>
+<li>Indice en el PT</li>
+<li>Offset dentro de la página</li>
+</ul>
+<p><img alt="operatoria" src="img/memoria/paginacion/operatoria.png"></p>
+<h4>TLB</h4>
+<p>Cada vez que se quiere direccionar, es necesario acceder a memoria dos veces
+para leer el PDE y el PTE. Para evitarlo, en la unidad de paginación hay un
+cache de traducciones, el <strong>Translation Lookaside Buffer</strong> (TLB)</p>
+<p>En este se guarda para un directorio y una tabla, la dirección física en la
+cual comienza la página.</p>
+<div class="codehilite"><pre><span></span>directorio_1  tabla_1   dir_fisica_base
+                  .
+                  .
+                  .
+directorio_n  tabla_n   dir_fisica_base
+</pre></div>
+
+
+<p>La escritura de un valor en el registro <code>CR3</code> flushea el contenido, excepto
+aquellas entradas que se setean como globales.</p>
+<h4>Identity Mapping</h4>
+<p>Es el equivalente a segmentación flat, consiste en que la dirección lineal
+coincida con la física.</p>
+<h2 id="combinacion">Combinación</h2>
+<p>A fin de cuentas para resolver una dirección, se emplean ambos sistemas</p>
+<p align="center">
+<img alt="Combinacion entre Paginación y Segmentación" src="img/memoria/combinacion.png" width=750 height=590>
+</p>
+
+<h2 id="ejemplo-de-mapa-de-memoria">Ejemplo de mapa de memoria</h2>
+<p align="center">
+<img alt="Mapa de memoria del TP" src="img/memoria/mapa-tp.png" width=500 height=600>
+</p>
+
+<h1 id="tareas">Tareas</h1>
+<p>El SO tiene un scheduler que se encarga de conmutar entre una lista de tareas
+a ejecutar, ejecutando cada una por un intervalo fijo de tiempo, por lo general
+atado a interrupciones del clock.</p>
+<ul>
+<li><strong>Tarea</strong>: Es una unidad de trabajo que un procesador puede despachar,
+  ejecutar, y detener a voluntad.</li>
+<li><strong>Espacio de ejecución</strong>: Es el conjunto de segmentos de código, datos y pila
+  que componen a la tarea.</li>
+<li><strong>Contexto de ejecución</strong>: Es el conjunto de valores de los registros internos
+  del procesador. Para poder suspender la ejecución de una tarea y poder
+  resumirla, es necesario almacenarlo.</li>
+<li><strong>Espacio de contexto</strong>: Donde es almacenado el contexto de ejecución.</li>
+</ul>
+<h2 id="estructuras">Estructuras</h2>
+<h3 id="tss">TSS</h3>
+<p>La TSS (Task State Segment) Es el lugar de memoria donde se guarda el contexto
+de cada tarea, su tamaño mínimo es <code>0x68</code> (su mínimo Limit es <code>0x67</code>).</p>
+<p align="center">
+<img alt="TSS" src="img/tareas/tss.png" width=477 height=620>
+</p>
+
+<p>El <code>EFLAGS</code> por defecto es <code>0x00000002</code> y con interrupciones habilitadas es
+<code>0x00000202</code>.</p>
+<h3 id="descriptor-de-tss">Descriptor de TSS</h3>
+<p align="center">
+<img alt="Descriptor de TSS" src="img/tareas/tss_descriptor.png" width=594 height=371>
+</p>
+
+<p>El bit <code>B</code> (Busy) sirve para evitar recursividad en el anidamiento de tareas.</p>
+<h3 id="tr">TR</h3>
+<p>En el Task Register se guarda selector de segmento de la GDT donde reside el
+descriptor de TSS de la tarea actual.</p>
+<p align="center">
+<img alt="TR" src="img/tareas/tr.png" width=602 height=593>
+</p>
+
+<p>Se modifica mediante las instrucciones</p>
+<div class="codehilite"><pre><span></span>ltr     Load Task Register
+str     Store Task Register
+</pre></div>
+
+
+<p>Por ejemplo</p>
+<div class="codehilite"><pre><span></span>mov ax, &lt;selector&gt;
+ltr ax
+</pre></div>
+
+
+<h2 id="despacho">Despacho</h2>
+<p>El procesador puede despachar tareas de las siguientes formas:</p>
+<ul>
+<li><code>call</code> a la tarea.</li>
+<li><code>jmp</code> a la tarea.</li>
+<li>Call a un interrupt-handler task (procesador)</li>
+<li>Call a un exception-handler task (procesador)</li>
+<li>Return con <code>iret</code> cuando está prendido el flag <code>NT</code> de <code>EFLAGS</code></li>
+</ul>
+<p>Por ejemplo, con un <code>jmp</code></p>
+<div class="codehilite"><pre><span></span><span class="nt">jmp</span> <span class="nt">0x20</span><span class="p">:</span><span class="nd">0</span>  <span class="o">;</span> <span class="nt">El</span> <span class="nt">offset</span> <span class="nt">no</span> <span class="nt">importa</span>
+</pre></div>
+
+
+<p>Pero si quisieramos hacerlo a un selector que no se puede poner como constante,
+es necesario hacerlo pasándolo por memoria. Esto es porque es de 48 bits.</p>
+<div class="codehilite"><pre><span></span><span class="n">selector</span><span class="o">:</span>   <span class="mh">0x0000</span>
+<span class="n">offset</span><span class="o">:</span>     <span class="mh">0x00000000</span>
+
+<span class="n">mov</span> <span class="n">ax</span><span class="o">,</span> <span class="n">selector</span>
+<span class="n">jmp</span> <span class="n">far</span> <span class="o">[</span><span class="n">offset</span><span class="o">]</span>        <span class="o">;</span> <span class="n">hacemos</span> <span class="n">jmp</span> <span class="n">a</span> <span class="n">offset</span> <span class="n">porque</span> <span class="n">lo</span> <span class="n">lee</span> <span class="n">como</span> <span class="n">little</span> <span class="n">endian</span>
+</pre></div>
+
+
+<h2 id="primera-tarea">Primera tarea</h2>
+<p>Para despachar la primera tarea, es necesario crear una <strong>tarea inicial</strong> para
+proveer una TSS en donde el procesador pueda guardar el contexto al momento
+de conmutar la primera.</p>
+<h2 id="conmutacion">Conmutación</h2>
+<ul>
+<li>El procesador analiza el valor que se debe colocar en el registro CS como
+  parte de la ejecución de un <code>jmp</code>, <code>call</code> o <code>iret</code> (con NT = 1).
+  o al que obtiene de una interrupt gate o trap gate.</li>
+<li>Busca el descriptor de la TSS en la GDT</li>
+<li>Si es un Task Gate, vuelve a buscar en la GDT donde debe encontrar un
+  descriptor de TSS.</li>
+<li>Si es un selector de TSS lo que intenta cargarse en el CS, busca en la GDT
+  el descriptor de TSS.</li>
+<li>Emplea el TSS actual para almacenar el estado del procesador.</li>
+<li>Setea el bit <code>CR0.TS</code> (Task Switch)</li>
+<li>Carga el nuevo TR y descriptor</li>
+<li>Aplica el contexto almacenado en el nuevo TSS.</li>
+</ul>
+<h2 id="anidamiento">Anidamiento</h2>
+<p>{{TODO}}</p>
+<h2 id="registros-xmm">Registros XMM</h2>
+<p>Los registros xmm no están en la TSS, ya que aumentaría los tiempos de
+conmutación entre tareas.</p>
+<p>Lo que hace entonces el procesador, es que cada vez que ejecuta una instrucción
+que utiliza algún registro xmm, se fija si se realizó un task switch viendo
+el bit <code>CR0.TS</code>. Si hubo, genera una excepción <code>#NM</code>, en cuyo handler se
+switchea el banco de registros, y se limpia <code>CR0.TS</code>.</p>
+<p>Para esto se usan las instrucciones</p>
+<div class="codehilite"><pre><span></span>fxsave  Guarda en memoria todos los registros xmm (bloque de 512 bytes)
+fxstr   Recupera de memoria los registros xmm
+</pre></div>
+
+
+<h2 id="scheduler">Scheduler</h2>
+<p>Ejemplo del juego</p>
+<p align="center">
+<img alt="Ejemplo de scheduler" src="img/tareas/scheduler.png" width=604 height=315>
+</p>
+
+<h1 id="interrupciones">Interrupciones</h1>
+<p>Las interrupciones pueden provenir de</p>
+<ul>
+<li>Hardware</li>
+<li>Software</li>
+<li>Internas</li>
+</ul>
+<p>Y se identifican mediante un valor numérico de 8 bits denominado <em>tipo</em>.
+(2^8 = 256 máx.)</p>
+<h2 id="fuentes">Fuentes</h2>
+<h3 id="hardware">Hardware</h3>
+<p>Señales eléctricas enviadas desde los dispositivos de hardware, generalmente
+manejadas por un controlador externo que las prioriza y envía a la CPU
+secuencialmente de acuerdo a ese criterio.</p>
+<p>El <strong>tipo</strong> es provisto por el hardware que interrumpe a través del pin <code>INTR</code>.</p>
+<p>Asincrónicas y no determinísticas.</p>
+<h3 id="software">Software</h3>
+<p>Se producen cuando se ejecuta la instrucción <code>int &lt;type&gt;</code>.
+Luego el tipo Acompaña al opcode de la instrucción. Por ejemplo, <code>int 0x80</code>
+en linux.</p>
+<p>Determinísticas.</p>
+<h3 id="internas-excepciones">Internas (Excepciones)</h3>
+<p>Son conocidas como <strong><em>excepciones</em></strong>. Generadas por la propia CPU como
+consecuencia de una situación que le impide completar la ejecución de la
+instrucción en curso.
+Cada excepción tiene su tipo asociado (predefinido).</p>
+<p><em>Ej: División por cero, page fault, violación de protección, etc.</em></p>
+<h4>Clasificación</h4>
+<ul>
+<li><strong>Fault</strong><p>Puede corregirse permitiendo al programa retomar la ejecución de esa
+  instrucción sin perder continuidad.
+  El procesador guarda en la pila la dirección de la instrucción que
+  produjo la falla.</p>
+</li>
+</ul>
+<ul>
+<li><strong>Trap</strong><p>Producida inmediatamente a continuación de una instrucción de trap.
+  Algunas permite que el procesador retome la ejecución sin perder continuidad
+  pero otras no.
+  El procesador guarda en la pila la dirección de la instrucción a ejecutarse
+  luego de la instrucción trapeada.</p>
+</li>
+</ul>
+<ul>
+<li><strong>Abort</strong><p>No siempre puede determinar la instrucción que la causó, ni permite
+  recuperar la ejecución de la tarea que la causó.
+  Reporta errores severos de hardware o inconsistencias en estructuras de
+  datos del sistema.</p>
+</li>
+</ul>
+<h2 id="idt">IDT</h2>
+<p>Debe definirse una tabla en memoria llamada <code>IDT</code> (Interrupt Descriptor Table)
+la cual almacena descriptores de sistema (<code>S = 0</code>).</p>
+<p>Solo tiene 256 entries ya que esa es la cantidad de tipos que reconoce.</p>
+<ul>
+<li>Interrupt Gate</li>
+<li>Trap Gate</li>
+<li>Task Gate</li>
+</ul>
+<p>Si se definen en esta tabla descriptores que no sean esos, se genera una <code>#GP</code>
+al intentar de vectorizar esa interrupción.</p>
+<p align="center">
+<img alt="Descriptores de gates" src="img/interrupciones/gate_descriptors.png" width=600 height=700>
+</p>
+
+<p>Para llegar a la <code>IDT</code>, se usa el registro <code>IDTR</code>.</p>
+<p align="center">
+<img alt="IDTR" src="img/interrupciones/idtr.png" width=624 height=414>
+</p>
+
+<h2 id="vectorizacion">Vectorización</h2>
+<p>Se llama <strong>vectorizar</strong> una interrupción al proceso de buscar su rutina de
+atención asociada.</p>
+<p>En caso de que sea una interrupt o trap gate:</p>
+<p align="center">
+<img alt="Vectorizacion Interrupt o Trap Gates" src="img/interrupciones/vectorizacion.png" width=785 height=520>
+</p>
+
+<p>Y si es una task gate</p>
+<p align="center">
+<img alt="Vectorizacion Task Gate" src="img/interrupciones/vectorizacion_task.png"  width=785 height=520>
+</p>
+
+<h2 id="privilegios-y-stack">Privilegios y stack</h2>
+<p>Cuando el procesador hace <code>call</code> a la rutina de atención de interrupción, hay
+dos posibilidades, se puede o no realizar un <strong>cambio de privilegio</strong>.</p>
+<p>Por ejemplo, si un código nivel usuario es interrumpida, la rutina de atención
+será de nivel supervisor, y entonces sucederá un cambio de privilegio.</p>
+<p>Al hacerse un cambio de privilegio, <strong>se hace un cambio de stack</strong>.</p>
+<p>Con cambio de privilegio:</p>
+<ul>
+<li>Se obtiene el <code>SS</code> y el <code>ESP</code> de la <code>TSS</code> de la tarea actual (interrumpida).</li>
+<li>Se pushean en el nuevo stack.</li>
+<li>Se guarda el estado actual, <code>EFLAGS</code>, <code>CS</code>, <code>EIP</code> en el nuevo stack</li>
+<li>Si la excepción hace que se guarde un código de error, se pushea.</li>
+</ul>
+<p>Sin cambio de privilegio:</p>
+<ul>
+<li>Se guarda el estado actual, <code>EFLAGS</code>, <code>CS</code>, <code>EIP</code> en el nuevo stack</li>
+<li>Si la excepción hace que se guarde un código de error, se pushea.</li>
+</ul>
+<p align="center">
+<img alt="Uso del Stack" src="img/interrupciones/stack.png" width=588 height=567 align="center">
+</p>
+
+<p>Para retornar de una rutina de atención se debe usar <code>iret</code>.</p>
+<h3 id="codigo-de-error">Código de error</h3>
+<p>Está compuesto de 3 bits</p>
+<div class="codehilite"><pre><span></span>0   1   2
+EXT IDT TI
+</pre></div>
+
+
+<ul>
+<li>
+<p><code>EXT</code>: <strong>External Event</strong></p>
+<p>Indica que la excepción fue causada por un evento externo al procesador.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>IDT</code>: <strong>Descriptor Location</strong></p>
+<p>Indica que el campo Segment Selector Index se refiere a un descriptor de
+gate en la IDT, cuando está en 0 indica que dicho campo se refiere a un
+descriptor en la GDT o en la LDT de la tarea actual.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>TI</code>: <strong>Table Indicator</strong> (GDT/LDT)</p>
+<p>Solo cuando <code>IDT</code> está en 0.
+- <code>0</code>: GDT
+- <code>1</code>: LDT</p>
+</li>
+</ul>
+<h2 id="prioridades">Prioridades</h2>
+<p>Que pasa cuando llega más de una interrupción?</p>
+<p align="center">
+<img alt="Prioridades" src="img/interrupciones/prioridades.png" width=640 height=640>
+</p>
+
+<h2 id="tipos-predefinidos">Tipos predefinidos</h2>
+<p>Detalle sobre los tipos en la sección 6.15 del manual de Intel
+<em>Systems Programming Guide</em>.</p>
+<table>
+<thead>
+<tr>
+<th>Vector</th>
+<th>Mnemonic</th>
+<th>Description</th>
+<th>Type</th>
+<th>Error Code</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><code>#DE</code></td>
+<td>Divide Error</td>
+<td>Fault</td>
+<td>No</td>
+<td><code>div</code>, <code>idiv</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>#DB</code></td>
+<td>Debug Exception Fault</td>
+<td>Trap</td>
+<td>No</td>
+<td>Instruction, data, and I/O breakpoints</td>
+</tr>
+<tr>
+<td>2</td>
+<td>—</td>
+<td>NMI Interrupt</td>
+<td>Interrupt</td>
+<td>No</td>
+<td>Nonmaskable external interrupt.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>#BP</code></td>
+<td>Breakpoint</td>
+<td>Trap</td>
+<td>No</td>
+<td><code>int3</code> instruction.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>#OF</code></td>
+<td>Overflow</td>
+<td>Trap</td>
+<td>No</td>
+<td><code>into</code> instruction.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>#BR</code></td>
+<td>BOUND Range Exceeded</td>
+<td>Fault</td>
+<td>No</td>
+<td><code>bound</code> instruction.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>#UD</code></td>
+<td>Invalid Opcode</td>
+<td>Fault</td>
+<td>No</td>
+<td><code>ud</code> instruction or reserved opcode.</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>#NM</code></td>
+<td>Device Not Available</td>
+<td>Fault</td>
+<td>No</td>
+<td>FP ins WAIT/FWAIT instruction.</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>#DF</code></td>
+<td>Double Fault</td>
+<td>Abort</td>
+<td>Yes (0)</td>
+<td>Cualquiera que genere, NMI, o INTR.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>-</td>
+<td>Reserved</td>
+<td>Fault</td>
+<td>No</td>
+<td>FP ins.</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>#TS</code></td>
+<td>Invalid TSS</td>
+<td>Fault</td>
+<td>Yes</td>
+<td>Task switch or TSS access.</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>#NP</code></td>
+<td>Segment Not Present</td>
+<td>Fault</td>
+<td>Yes</td>
+<td>Cargar registros de segmentos o accederlos</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>#SS</code></td>
+<td>Stack-Segment Fault</td>
+<td>Fault</td>
+<td>Yes</td>
+<td>Stack operations and SS register loads.</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>#GP</code></td>
+<td>General Protection</td>
+<td>Fault</td>
+<td>Yes</td>
+<td>Referencias a memoria y checks protección</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>#PF</code></td>
+<td>Page Fault</td>
+<td>Fault</td>
+<td>Yes</td>
+<td>Any memory reference.</td>
+</tr>
+<tr>
+<td>15</td>
+<td>—</td>
+<td>Intel reserved.</td>
+<td>-</td>
+<td>No</td>
+<td>-</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>#MF</code></td>
+<td>FPU Error</td>
+<td>Fault</td>
+<td>No</td>
+<td>FPU or WAIT/FWAIT instruction.</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>#AC</code></td>
+<td>Alignment Check</td>
+<td>Fault</td>
+<td>Yes (0)</td>
+<td>Any data reference in memory.</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>#MC</code></td>
+<td>Machine Check</td>
+<td>Abort</td>
+<td>No</td>
+<td>-</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>#XM</code></td>
+<td>SIMD FP Exception</td>
+<td>Fault</td>
+<td>No</td>
+<td>SSE/SSE2/SSE3 floating-point instructions.</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>#VE</code></td>
+<td>Virtualization ex.</td>
+<td>Fault</td>
+<td>No</td>
+<td>EPT violations.</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>#CP</code></td>
+<td>Control Protection ex.</td>
+<td>Fault</td>
+<td>Yes</td>
+<td>-</td>
+</tr>
+<tr>
+<td>22-31</td>
+<td>—</td>
+<td>Intel reserved.</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>32-255</td>
+<td>—</td>
+<td>User Defined</td>
+<td>Interrupt</td>
+<td>-</td>
+<td>External interrupt or INT n instruction.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="rutinas-de-atencion">Rutinas de atención</h2>
+<p>Deben realizar</p>
+<ol>
+<li>Preservar los registros de la tarea interrumpida con <code>pushad</code></li>
+<li>Si es una interrupción de hardware, llamar <code>pic_finish</code> para indicar que
+   fue atendida.</li>
+<li>Realizar la tarea correspondiente</li>
+<li>Restaurar los registros con <code>popad</code></li>
+<li>Retornar de la interrupción con <code>iret</code></li>
+</ol>
+<h3 id="instrucciones">Instrucciones</h3>
+<ul>
+<li><code>pushad</code><p>Pushea <code>EAX</code>, <code>ECX</code>, <code>EDX</code>, <code>EBX</code>, <code>ESP</code> (original value), <code>EBP</code>,
+  <code>ESI</code>, y <code>EDI</code>.</p>
+</li>
+</ul>
+<ul>
+<li><code>in al/ax/eax imm8</code><p>Input byte from imm8 I/O port address into AL/AX/EAX.</p>
+</li>
+</ul>
+<h1 id="proteccion">Protección</h1>
+<p>Cuando el procesador pasa a <em>modo protegido</em> se pone en funcionamiento la
+<strong>unidad de protección</strong>. Esta supervisa las operaciones internas del
+procesador, comprobando el cumplimiento de una serie de reglas que constituyen
+el entorno de protección necesario para implementar de manera eficiente la
+multitarea.</p>
+<p>Cubren los siguientes chequeos</p>
+<ul>
+<li>Segmentos<ul>
+<li>Limite</li>
+<li>Tipo</li>
+</ul>
+</li>
+<li>Privilegios de segmentos y páginas</li>
+<li>Restricción del dominio de direccionamiento a las tareas</li>
+<li>Restricción de los puntos de entrada a los procedimientos</li>
+<li>Restricción en el uso del set de instrucciones.</li>
+</ul>
+<h2 id="segmentos">Segmentos</h2>
+<h3 id="limite">Limite</h3>
+<p>Tiene en cuenta los atributos <code>G</code>, <code>D/B</code> y <code>ED</code>.
+Se le llama límite efectivo al resultado de tener todo eso en cuenta.</p>
+<h4>Sin ED</h4>
+<p>El limite efectivo será la última dirección a la cual se puede acceder dentro
+del segmento.</p>
+<p>Se fija que el offset al que se quiere acceder no sea mayor al límite <strong>efectivo</strong>. Caso contrario, se genera una excepción <code>#GP</code>.</p>
+<p>Ejemplos:</p>
+<ul>
+<li>Un <code>byte</code> cuyo offset sea mayor al limite efectivo.</li>
+<li>Una <code>word</code> cuyo offset sea mayor al limite efectivo - 1.</li>
+<li>Una <code>quadword</code> cuyo offset sea mayor que limite efectivo - 7.</li>
+</ul>
+<h4>Con ED</h4>
+<p>El limite efectivo es el último offset que no puede ser accedido ya que genera
+una <code>#GP</code>.</p>
+<p>El rango de offsets validos va de</p>
+<ul>
+<li><code>D/B = 0</code>: (limite efectivo + 1) a <code>0xFFFF</code></li>
+<li><code>D/B = 1</code>: (limite efectivo + 1) a <code>0xFFFFFFFF</code></li>
+</ul>
+<p>Son usados para pilas.</p>
+<h3 id="tipo">Tipo</h3>
+<p>Se toma en cuenta el atributo <code>S</code>.</p>
+<p>No está permitido a la hora de cargar un segmento:</p>
+<ul>
+<li>Cargar en <code>CS</code> un selector cuyo descriptor corresponda a uno de datos.</li>
+<li>Cargar en <code>SS</code> o uno de datos (<code>DS</code>, <code>ES</code>, ...) un selector cuyo
+  descriptor corresponda a uno de código con <code>R=0</code>.</li>
+<li>Cargar en <code>SS</code> un selector cuyo descriptor de segmento corresponde a uno de
+  datos con <code>W=0</code>.</li>
+<li>Cargar en <code>LDTR</code> un selector que no corresponda a un descriptor de <code>LDT</code>.</li>
+<li>Cargar en <code>TR</code> un selector que no corresponda a un descriptor de TSS.</li>
+</ul>
+<p>Durante la ejecución de instrucciones que acceden a segmentos con selectores
+ya cargados:</p>
+<ul>
+<li>No se puede escribir en un segmento de código.</li>
+<li>No se puede escribir dentro de un segmento de datos con <code>W=0</code>.</li>
+<li>No se puede leer un segmento de código si <code>R=0</code>.</li>
+</ul>
+<h3 id="selectores-nulos">Selectores nulos</h3>
+<p>Asignar un selector de segmento nulo en los registros de segmento <code>CS</code> o <code>SS</code>
+genera una excepción <code>#GP</code>.</p>
+<p>Sin embargo, se puede asignar a <code>DS</code>, <code>ES</code>, <code>FS</code> o <code>GS</code>. Pero al intentar
+acceder al segmento, generará la excepción <code>#GP</code>.</p>
+<p>Esto puede ser útil para detectar accesos a registros de segmento no utilizados,
+o para prevenir accesos no deseados a segmentos de datos.</p>
+<h3 id="privilegios">Privilegios</h3>
+<p align="center">
+<img alt="Modelo de anillos" src="img/proteccion/anillos.png" width=441 height=311>
+</p>
+
+<p>Lo menor numérico es lo más privilegiado.
+El uso real que tienen es que todo lo kernel es 0, user 3, y el medio no se usa.</p>
+<p>Los accesos entre segmentos están regidos por reglas que contemplan los niveles
+de privilegio. Se chequean cuando se carga el selector en el registro de
+segmento.</p>
+<h4>Tipos</h4>
+<ul>
+<li>
+<p><code>DPL</code>: <strong>Descriptor Privilege Level</strong></p>
+<p>Nivel de privilegio del segmento a ser accedido (especificado en el
+descriptor).</p>
+<ul>
+<li>Datos / Call Gate / TSS: Indica el máximo valor numérico (min privilegio)
+  que debe tener el código de una tarea para acceder.</li>
+<li>Codigo <strong>no conforming</strong>: Nivel que debe tener una tarea para accederlo,
+  <strong>exactamente</strong>.</li>
+<li>Codigo conforming: Indica el mínimo valor numérico que debe tener el código
+  para poder acceder al apuntado.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>CPL</code>: <strong>Current Privilege Level</strong></p>
+<p>Nivel de privilegio del segmento de código que estamos ejecutando.
+El procesador lo mantiene en el caché hidden del selector, ya que se lo
+leyó directo de la tabla de descriptores.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>RPL</code>: <strong>Requested Privilege Level</strong></p>
+<p>Es el valor que se escribe en los primeros dos bits de los selectores.
+Este puede ser cambiado por el programador.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>EPL</code>: <strong>Effective Privilege Level</strong></p>
+<p>Se queda con el <em>menos</em> privilegiado entre el <code>CPL</code> y el <code>RPL</code>. (Es decir,
+el máximo numérico)</p>
+<div class="codehilite"><pre><span></span>EPL = Max(CPL, RPL)
+</pre></div>
+
+
+<p>Esto quiere decir que una tarea no puede hacerse la viva y poner que es kernel
+cuando en realidad es user, porque el CPL lo toma de una caché oculta que no
+tiene forma de modificar. Por lo tanto su EPL seguirá siendo 3.</p>
+</li>
+</ul>
+<h4>Nivel adecuado</h4>
+<p>Para saber si tenemos el nivel adecuado,</p>
+<ul>
+<li>Segmento de datos: <code>EPL &lt;= DLP</code></li>
+<li>Segmento de código:<ul>
+<li>Non-conforming: <code>EPL = DPL</code></li>
+<li>Conforming: <code>CPL &gt;= DPL</code></li>
+</ul>
+</li>
+</ul>
+<p>Donde las comparaciones son por valor numérico. Si no se cumple alguna, <code>#GP</code>.</p>
+<h2 id="paginacion_1">Paginación</h2>
+<h3 id="privilegios_1">Privilegios</h3>
+<p>Se combina con segmentación.</p>
+<p>Hay dos niveles</p>
+<ul>
+<li><code>U/S = 0</code>: <strong>Supervisor</strong> (Corresponde a CPL 0, 1, 2)</li>
+<li><code>U/S = 1</code>: <strong>User</strong> (CPL 3)</li>
+</ul>
+<p>Cualquier violación al sistema de protección de páginas genera un <code>#PF</code>.</p>
+<ul>
+<li>El modo supervisor puede acceder a todas las páginas, y en modo usuario solo
+  a las que son de usuario.</li>
+<li>
+<p>El modo supervisor también puede escribir en cualquier página, aunque sea
+  read only (<code>R/W = 0</code>).</p>
+<p>Para evitar esto, hay un bit en CR0, <code>CR0.WP</code> (<em>Write Protect</em>). Cuando está
+en 1 impide que el procesador escriba en una página Read Only.</p>
+</li>
+</ul>
+<ul>
+<li>El procesador chequea la protección en el <em>Page Directory</em> y también en cada
+  <em>Page Table</em>.</li>
+</ul>
+<h4>Combinación</h4>
+<p align="center">
+<img alt="Combinacion" src="img/proteccion/combinacion.png" width=686 height=444>
+</p>
+
+<h2 id="interrupciones_1">Interrupciones</h2>
+<p>Se tiene el privilegio necesario para hacer <code>int &lt;type&gt;</code> si <code>CPL &lt;= DPL</code>,
+tomando el <code>DPL</code> del descriptor de la IDT. Sino <code>#GP</code>.</p>
+<p>Al tratarse de interrupciones por hardware, se ignoran los bits de <code>DPL</code>.</p>
+<h2 id="tareas_1">Tareas</h2>
+<p>Para ver si se puede efectuar la conmutación, <code>CPL &lt;= DPL</code>, tomando el <code>DPL</code> del
+descriptor de la TSS.</p>
+<p>También es necesario que <code>B = 0</code> (i.e que no esté corriendo ya).</p>
+<p>Sino, <code>#GP</code>.</p>
+<h2 id="instrucciones_1">Instrucciones</h2>
+<p>El Registro <code>EFLAGS</code> contiene el campo <code>IOPL</code> (bits 12 y 13) que determina el
+nivel de privilegio que debe tener la tarea en curso para acceder a la E/S.
+Luego pueden ejecutarse <code>IN</code>, <code>OUT</code>, <code>INS</code>, <code>OUTS</code>, sii CPL = IOPL.</p>
+<p>Las instrucciones que en modo protegido solo pueden ejecutarse desde privilegio
+0 son:</p>
+<ul>
+<li><code>LGDT</code> - Cargar registro GDTR</li>
+<li><code>LLDT</code> - Cargar registro LDTR</li>
+<li><code>LTR</code> - Cargar registro TR</li>
+<li><code>LIDT</code> - Cargar Registro IDTR</li>
+<li><code>MOV</code> - si destino es un Registro deControl</li>
+<li><code>MOV</code> - si destino es un Registro de Debug</li>
+<li><code>LMSW</code> - Escribir en el Machine Status</li>
+<li><code>Word</code> (parte baja de CR0)</li>
+<li><code>CLTS</code> - Clear Flag Task-Switched en CR0</li>
+<li><code>INVD</code> - Invalidar Cache sin Write Back</li>
+<li><code>WBINVD</code> - Invalidar Cache con Write Back</li>
+<li><code>INVLPG</code> - Invalidar entrada de la TLB</li>
+<li><code>HLT</code> - Parar el procesador</li>
+<li><code>RDMSR</code> - Leer Model Specific Register</li>
+<li><code>WRMSR</code> - Escribir Model Specific Register</li>
+<li><code>RDPMC</code> - Leer Contador de Monitoreo de Performance</li>
+<li><code>RDTSC</code> - Leer Time Stamp Counter</li>
+</ul>
+<h1 id="c">C</h1>
+<h2 id="assembly-inline">Assembly Inline</h2>
+<p>Provistos para el TP3</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;</span> <span class="n">i386</span><span class="p">.</span><span class="k">asm</span>
+
+<span class="kt">uint32_t</span> <span class="n">reax</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rebx</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">recx</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">redx</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">resi</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">redi</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rebp</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">resp</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">reip</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+
+<span class="kt">uint32_t</span> <span class="nf">rcs</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rds</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">res</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rfs</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rgs</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rss</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">reflags</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">hlt</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">breakpoint</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">lcr0</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">val</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rcr0</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">lcr1</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">val</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rcr1</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">lcr2</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">val</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rcr2</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">lcr3</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">val</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rcr3</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">lcr4</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">val</span><span class="p">);</span>
+<span class="kt">uint32_t</span> <span class="nf">rcr4</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">tlbflush</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">ltr</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">sel</span><span class="p">);</span>
+<span class="kt">uint16_t</span> <span class="nf">rtr</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</pre></div>
+
+
+<h2 id="macros-con-parametros">Macros con parametros</h2>
+<p>Se pueden hacer defines con parametros</p>
+<div class="codehilite"><pre><span></span><span class="cp">#define PDE_INDEX(virtual) virtual &gt;&gt; 22</span>
+</pre></div></article>
+</body></html>

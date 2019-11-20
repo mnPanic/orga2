@@ -1,0 +1,5 @@
+{
+    "markdown.extensions.toc": {
+        "toc_depth": 3
+    }
+}
