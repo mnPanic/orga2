@@ -1,6 +1,6 @@
-# Final
+# Final
 
-## Recursos
+## Recursos
 
 1. [Clases de Onur Mutlu][1]
 2. [teoricas](teoricas)
