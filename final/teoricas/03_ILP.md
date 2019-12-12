@@ -198,7 +198,7 @@ sea directamente proporcional a su cantidad de etapas.
 
 ### Criterios
 
-- **predicted-non-taken**
+- **predicted-not-taken**
 
   El procesador asume por defecto que el salto nunca se toma, continúa la
   búsqueda del opcode de las instrucciones siguientes como si el salto fuese una
@@ -236,7 +236,7 @@ sea directamente proporcional a su cantidad de etapas.
   si o si independientemente del resultado de la evaluación del branch, y se
   aplica o no su resultado dependiendo de la evaluación de la condición.
 
-  Si es non-taken, no genera ninguna demora, y si es taken, se descarta la
+  Si es not-taken, no genera ninguna demora, y si es taken, se descarta la
   ejecución y se tiene un ciclo de clock para que salga el resultado de la
   instrucción de destino.
 
@@ -258,7 +258,7 @@ Modelos:
 - Predicción simple de 1 bit
 
   Es una tabla indexada por la posición de memoria de la instrucción de salto
-  y un bit que indica el resultado reciente del salto (**taken** o **non-taken**)
+  y un bit que indica el resultado reciente del salto (**taken** o **not-taken**)
 
   ![Branch Prediction Buffer](img/ILP/branch-prediction/buffer-1b.png)
 
@@ -307,18 +307,18 @@ Conclusiones:
 
 Caché de instrucciones de salto que contiene para cada entrada el par (dirección
 de la instrucción de salto, dirección target resuelta) y **no** tiene los bits
-**taken** o **non-taken**.
+**taken** o **not-taken**.
 
 ![Branch Target Buffer](img/ILP/branch-prediction/branch-target-buffer.png)
 
 A este se accede con el valor completo del PC.
 
 - Si el valor no se encuentra, se asume **taken**
-  - Si el resultado es **non-taken**, se acepta el stall, y no se almacena nada
+  - Si el resultado es **not-taken**, se acepta el stall, y no se almacena nada
     en el BTB.
   - Si el resultado es **taken**, se ingresa el valor al BTB.
 - Si el valor se encuentra en el BTB, se aplica el target almacenado
-  - Si es **non-taken**, guarda el nuevo valor en el BTB luego de la penalidad
+  - Si es **not-taken**, guarda el nuevo valor en el BTB luego de la penalidad
     correspondiente en el pipeline.
   - Si es **taken** no hay penalidad, y no se guarda ningún nuevo valor.
 
