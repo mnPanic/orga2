@@ -8,7 +8,7 @@ Las clases (o lecturas) importantes son la 9, 10, 11 (Habla de ROB), 12 (Habla
 de Tomasulo), 13, 17 y 18 (la 28 habla de Coherencia de Caché (minuto 1:05:20) y
 la 29 habla de Snooping Protocols y MESI entre otras cosas).
 
-- L1. Introduction and Basics
+- [L1. Introduction and Basics](01_introduction.md)
 - L2. Fundamental Concepts and ISA
 - L3. ISA Tradeoffs
 - L4. ISA Tradeoffs (cont.) & MIPS ISA
@@ -16,7 +16,7 @@ la 29 habla de Snooping Protocols y MESI entre otras cosas).
 - L6. Multi-Cycle and Microprogrammed Microarchitectures
 - L7. Pipelining
 - L8. Pipelining II: Data and Control Dependence Handling
-- L9. **Branch Prediction I**
+- [L9. **Branch Prediction I**](09_branch_prediction.md)
 - L10. **Branch Handling and Branch Prediction II**
 - L11. **Precise Exceptions, State Maintenance, State Recovery**
 - L12. **Out-of-Order Execution**
