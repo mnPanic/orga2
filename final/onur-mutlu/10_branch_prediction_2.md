@@ -78,3 +78,20 @@ la "mejor" predicción.
 - Solution: Detectar estas biased branches y predecirlas con un predictor
   más simple (ex. last-tine, static, ...)
 
+## Resumen
+
+Manejo de dependencias de control en maquinas con pipeline
+
+- Delayed branching
+- Fine-grained multithreading
+- Branch prediction
+  - Compile time (static)
+  - Run time (dynamic)
+    - Last time predictor
+    - Hysterisis: 2BC predictor
+    - Global branch correlation -> two level global predictor
+    - Local branch correlation -> two level local predictor
+    - Hybrid branch predictors
+- Predicated execution
+- Multipath execution
+- Return address stack & indirect branch prediction

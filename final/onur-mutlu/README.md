@@ -18,14 +18,14 @@ la 29 habla de Snooping Protocols y MESI entre otras cosas).
 - L8. Pipelining II: Data and Control Dependence Handling
 - [L9. **Branch Prediction I**](09_branch_prediction.md)
 - [L10. **Branch Handling and Branch Prediction II**](10_branch_prediction_2.md)
-- L11. **Precise Exceptions, State Maintenance, State Recovery**
-- L12. **Out-of-Order Execution**
-- L13. **Out-of-Order Execution and Data Flow**
+- L11. **Precise Exceptions, State Maintenance, State Recovery** (2h)
+- L12. **Out-of-Order Execution** (1h50)
+- L13. **Out-of-Order Execution and Data Flow** (1h40)
 - L14. SIMD Processing (Vector and Array Processors)
 - L15. GPUs, VLIW, DAE
 - L16. Static Instruction Scheduling
-- L17. **Memory Hierarchy and Caches**
-- L18. **Caches, Caches, Caches**
+- L17. **Memory Hierarchy and Caches** (1h)
+- L18. **Caches, Caches, Caches** (1h50)
 - L19. High Performance Caches
 - L20. Virtual Memory
 - L21. Main Memory
@@ -35,8 +35,8 @@ la 29 habla de Snooping Protocols y MESI entre otras cosas).
 - L25. Prefetching
 - L26. More Prefetching and Emerging Memory Technologies
 - L27. Multiprocessors
-- L28. Memory Consistency and Cache Coherence
-- L29. Cache Coherence
+- L28. **Memory Consistency and Cache Coherence** (1:05:20 en adelante)
+- L29. **Cache Coherence**
 - L30. In-Memory Processing
 - L31. Predictable Performance
 - L32. Heterogeneous Systems
