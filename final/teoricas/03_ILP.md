@@ -89,13 +89,13 @@ también con el fetch de la siguiente instrucción
 Por ejemplo, saliendo del siguiente escenario donde las etapas que hacen uso
 de memoria están marcadas en rojo,
 
-![Ideal](img/ILP/pipeline/ideal.png)
+![Ideal](img/ILP/pipeline/ideal-mem.png)
 
 Cómo no se pueden realizar a la vez dos etapas que hagan uso de memoria,
 entonces las que corresponden a instrucciones posteriores se quedan esperando,
 y así se aumenta la cantidad de ciclos de clock que lleva.
 
-![Final](img/ILP/pipeline/real.png)
+![Final](img/ILP/pipeline/real-mem.png)
 
 ##### Estructurales - solución
 
