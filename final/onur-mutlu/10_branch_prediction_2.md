@@ -57,7 +57,7 @@ per-branch history register + history at that history register value.
 
 ![Two level local history branch predictor](img/10/2-lvl-local.png)
 
-## Hybrid
+## Hybrid
 
 Idea: Usar más de un tipo de predictor (i.e multiples algoritmos) y seleccionar
 la "mejor" predicción.
@@ -70,7 +70,7 @@ la "mejor" predicción.
   - Es necesario un "meta-predictor" o "selector"
   - Latencia de acceso mayor.
 
-## Biased branches
+## Biased branches
 
 - Obs: Muchas branches están biased en una dirección (ex. 99% taken)
 - Problem: Estas branches contaminan las estructuras de predicción, causando

@@ -1,6 +1,6 @@
 # Lecture 11 - Precise Exceptions, State Maintenance / Recovery
 
-## Summary
+## Summary
 
 Varios métodos para mantener *precise state*
 

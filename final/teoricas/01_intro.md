@@ -1,6 +1,6 @@
 # Arquitectura de Computadores
 
-## Arquitectura
+## Arquitectura
 
 Es el conjunto de recursos accesibles para el programador.
 Por lo general se mantiene a través de los modelos de procesadores de esa
@@ -16,7 +16,7 @@ anteriores)
 Implementación en el silicio de la arquitectura. Puede cambiar de un modelo a
 otro de la misma familia.
 
-## ISA
+## ISA
 
 El *Instruction Set Architecture* (ISA) es el set de instrucciones visibles por
 el programador. Es la interfaz entre el software y el hardware.
@@ -32,7 +32,7 @@ Se diferencian entre sí según varios criterios:
 - **Control flow**: jmps condicionales, calls.
 - **Longitud de código**: Instrucciones de tamaño fijo vs variable.
 
-## Organización
+## Organización
 
 Es los detalles de la implementación de la ISA.
 

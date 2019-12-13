@@ -82,7 +82,7 @@ dependen de cnd)
 
 Y no todos los branches (ex. loop) se pueden eliminar de esta manera.
 
-## Branch delay slot (delayed branching)
+## Branch delay slot (delayed branching)
 
 Cambia la semántica de la instrucción de branch.
 
@@ -189,7 +189,7 @@ no-ops.
   - Solo funciona si **no** hay dependencias entre los threads. De haberlas,
     habría que chequearlas.
 
-## Branch prediction
+## Branch prediction
 
 ![Branch prediction](img/09/branch-prediction.png)
 
@@ -225,7 +225,7 @@ Con un pipeline más ancho esto empeora.
 Una forma de mejorar la performance del branch prediction es reducir cualquiera
 de esos dos (la probabilidad y/o penalty de un wrong guess).
 
-### Reducir penalty
+### Reducir penalty
 
 Haciendo el fetch antes
 
@@ -266,7 +266,7 @@ sabemos que la instrucción es de branch (sino no estaría el target address).
 
 ![Fetch engine con branch prediction](img/09/btb.png)
 
-### Predicción de dirección
+### Predicción de dirección
 
 Esquemas
 
