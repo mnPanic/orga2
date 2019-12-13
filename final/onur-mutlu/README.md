@@ -17,7 +17,7 @@ la 29 habla de Snooping Protocols y MESI entre otras cosas).
 - L7. Pipelining
 - L8. Pipelining II: Data and Control Dependence Handling
 - [L9. **Branch Prediction I**](09_branch_prediction.md)
-- L10. **Branch Handling and Branch Prediction II**
+- [L10. **Branch Handling and Branch Prediction II**](10_branch_prediction_2.md)
 - L11. **Precise Exceptions, State Maintenance, State Recovery**
 - L12. **Out-of-Order Execution**
 - L13. **Out-of-Order Execution and Data Flow**
